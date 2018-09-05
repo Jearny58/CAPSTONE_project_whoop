@@ -12,4 +12,9 @@ str(df_original)
 
 View(df_original)
 
-df_original$Date
+date_column_edit <- format(df_original$Date, format = "%Y-%m-%d")
+date_column_edit
+class(date_column_edit)
+str(date_column_edit)
+
+class(df_original$Date)
