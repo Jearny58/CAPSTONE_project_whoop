@@ -18,3 +18,6 @@ class(date_column_edit)
 str(date_column_edit)
 
 class(df_original$Date)
+ggplot(df_original, aes(x = df_original$HRV)) + geom_histogram()
+ggplot(df_original, aes(x = df_original$Calories)) + geom_histogram()
+ggplot(df_original, aes(x = df_original$Total.Sleep..hrs.)) + geom_histogram()
