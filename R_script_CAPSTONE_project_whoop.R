@@ -9,3 +9,7 @@ df_original <- read.xls("capstone_WHOOP_data_14aug_18apr.xlsx")
 class(df_original)
 names(df_original)
 str(df_original)                
+
+View(df_original)
+
+df_original$Date
