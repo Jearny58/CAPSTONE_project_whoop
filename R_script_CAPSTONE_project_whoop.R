@@ -10,8 +10,6 @@ class(whoop_df_original)
 names(whoop_df_original)
 str(whoop_df_original)                
 
-View(whoop_df_original)
-
 # create new data frame to edit
 whoop_edit <- whoop_df_original
 
@@ -24,6 +22,7 @@ whoop_edit_recovery <- whoop_edit
 whoop_edit_recovery$Recovery <- as.numeric(whoop_edit_recovery$Recovery)
 class(whoop_edit_recovery$Recovery)
 whoop_edit_recovery$Recovery
+View(whoop_edit_recovery)
 
 # new data frame to edit Sleep Performance column
 class(whoop_edit_recovery$Sleep.Performance)
@@ -34,6 +33,8 @@ class(whoop_edit_sleep_perf$Sleep.Performance)
 
 #save updates to new data frame, whoop_edit2
 whoop_edit2 <- whoop_edit_sleep_perf
+View(whoop_edit2)
+mean(whoop_edit2$Sleep.Performance, na.rm = TRUE)
 
 #load ggplot libary
 library(ggplot2)
