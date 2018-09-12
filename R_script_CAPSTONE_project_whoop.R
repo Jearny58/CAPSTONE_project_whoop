@@ -8,7 +8,8 @@ whoop_df_original <- read.csv("capstone_WHOOP_data_14aug_18apr.csv", header = TR
 whoop_df_original
 class(whoop_df_original)
 names(whoop_df_original)
-str(whoop_df_original)                
+str(whoop_df_original)
+summary(whoop_df_original)
 
 # create new data frame to edit
 whoop_edit <- whoop_df_original
@@ -16,10 +17,11 @@ whoop_edit <- whoop_df_original
 # remove empty rows 120 - 179
 whoop_edit <- whoop_edit[-c(120:179), ]
 View(whoop_edit)
+summary(whoop_edit)
 
 #new data frame to edit Recovery column; convert from factors to numerics
 whoop_edit_recovery <- whoop_edit
-whoop_edit_recovery$Recovery <- as.numeric(whoop_edit_recovery$Recovery)
+whoop_edit_recovery$Recovery <- as.numeric(sub("%", "e-2", whoop_edit_recovery$Recovery))
 class(whoop_edit_recovery$Recovery)
 whoop_edit_recovery$Recovery
 View(whoop_edit_recovery)
@@ -27,7 +29,7 @@ View(whoop_edit_recovery)
 # new data frame to edit Sleep Performance column
 class(whoop_edit_recovery$Sleep.Performance)
 whoop_edit_sleep_perf <- whoop_edit_recovery
-whoop_edit_sleep_perf$Sleep.Performance <- as.numeric(whoop_edit_sleep_perf$Sleep.Performance)
+whoop_edit_sleep_perf$Sleep.Performance <- as.numeric(sub("%", "e-2", whoop_edit_sleep_perf$Sleep.Performance))
 class(whoop_edit_sleep_perf$Sleep.Performance)
 
 
@@ -36,12 +38,24 @@ whoop_edit2 <- whoop_edit_sleep_perf
 View(whoop_edit2)
 mean(whoop_edit2$Sleep.Performance, na.rm = TRUE)
 
+names(whoop_edit2) = c("date", "strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal", "hrv", "restHR", "timeInBed", "timeLightSleep", "timeREMSleep", "timeDeepSleep", "totalSleep", "sleepCycles")
+colnames(whoop_edit2)
+
+cor(whoop_edit2[c("strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal", "hrv", "restHR", "timeInBed", "timeLightSleep", "timeREMSleep", "timeDeepSleep", "totalSleep", "sleepCycles")])
+
 #load ggplot libary
 library(ggplot2)
-ggplot(whoop_edit2, aes(x = whoop_edit2$HRV)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$Recovery)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$Sleep.Performance)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$Sleep.Performance, y = whoop_edit2$Recovery)) + scale_x_log10() + scale_y_log10() + geom_jitter()
+ggplot(whoop_edit2, aes(x = whoop_edit2$hrv)) + geom_histogram()
+ggplot(whoop_edit2, aes(x = whoop_edit2$recovery)) + geom_histogram()
+ggplot(whoop_edit2, aes(x = whoop_edit2$sleepPerform)) + geom_histogram()
+ggplot(whoop_edit2, aes(x = whoop_edit2$sleepPerform, y = whoop_edit2$recovery)) + scale_x_log10() + scale_y_log10() + geom_jitter()
+ggplot(whoop_edit2, aes(x = whoop_edit2$strain)) + geom_histogram()
+ggplot(whoop_edit2, aes(x = whoop_edit2$cal)) + geom_histogram()
+ggplot(whoop_edit2, aes(x = whoop_edit2$maxHR, y = whoop_edit2$strain)) + geom_jitter()
+ggplot(whoop_edit2, aes(x = whoop_edit2$averHR, y = whoop_edit2$strain, color = whoop_edit2$sleepPerform)) + geom_jitter()
+ggplot(whoop_edit2, aes(x = whoop_edit2$averHR, y = whoop_edit2$restHR)) + geom_jitter()
+ggplot(whoop_edit2, aes(x = whoop_edit2$averHR, y = whoop_edit2$sleepPerform)) + geom_jitter()
+
 
 #ggplot(df_original, aes(x = df_original$Calories)) + geom_histogram()
 #ggplot(df_original, aes(x = df_original$Total.Sleep..hrs.)) + geom_histogram()
