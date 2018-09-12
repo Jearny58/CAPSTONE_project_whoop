@@ -1,0 +1,45 @@
+---
+title: "Capstone_Markdown_whoop"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+Top athletes are constantly engaged in a delicate balancing act
+between overdoing it — risking overtraining and injury — and under-doing it — leaving unrealized performance gains on the table.
+
+WHOOP was designed to help athletes navigate this line by gathering biological data through a wearable device. It then presents this information via two primary metrics: Strain and Recovery. 
+
+WHOOP Strain is reported on a scale from 0 to 21 and measures the total cadriovascular load experienced over a specified period of time - such as a workout or day - normalized such that a 21.0 represents the maximal caridovascular load that could be attained in a day. It essentially answers the question: "As a function of the total amount of cardiovascular load I could have possibly placed on my body today, how much load did I experience during this period?"
+
+WHOOP is different than many other wearables in that it does not attempt to directly model external load (i.e. things like steps taken, miles ran, etc.). Rather it measures what that load meant to you. By monitoring cardiovascular response to load rather than load itself, WHOOP is able to account for
+contributors to fatigue that external measures of load simply cannot account for, such as the increased effort required to exercise when it’s hot. Perhaps even more valuable though is the ability to capture sources of Strain that are impossible or impractical to measure via traditional methods, such as emotional stress8 or the minor loads of everyday life, like grocery shopping. 
+
+UNDERSTANDING WHOOP RECOVERY
+WHOOP Recovery, reported on a scale from zero to 100 percent, measures the body’s ability to adapt to a training stimulus. Development of the Recovery algorithm was largely inspired by the finding that there exists an inconsistent “dose response to training”; meaning how hard I train is only one of multiple factors which determine my physiological adaptation (how much more fit I become). 
+
+VARIABLES IN DATA SET
+Date: day, month and year of observation
+Strain: cardiovascular load experienced on the respective date
+Recovery: body's ability to adapt to training stimulus
+Sleep perfomance: how recovered the athlete is; largely determined by actual amount of sleep versus recommended amount of sleep need according to daily strain
+Max HR: max heart rate on that respective date
+Average HR: average heart over the course of that entire day
+Calories: approx. calories burned based off of cardiovascular load
+HRV: heart rate variability, a measure of fluctuation in the length of the time interval between successive heartbeats
+Resting HR: average heart rate during sleeping phase
+Time in bed: The total amount of time spent in bed, which includes time awake and time in state of sleep
+Light Sleep: approximate amount of time spent in light sleep stage
+REM Sleep: approximate amount of time spent in REM sleep stage
+SWS Deep Sleep: approximate amount of time spent in SWS Deep sleep 
+Total Sleep: total amount of time spent sleeping (which includes Light, REM, and SWS Deep sleep)
+Sleep cycles: total amount of sleep cycles achieved during that days respective sleep session (1 stage is defined as going from Light, to REM, to SWS Deep sleep without interruption, i.e. waking up, being disturbed, etc.)
+
+WHAT VARIABLE AM I TRYING TO PREDICT?
+Based off of this data set I hope to generate a model that will predict a Recovery score based off of a theoretical cardiovascular score for a respective day. 
