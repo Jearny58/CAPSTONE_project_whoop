@@ -43,6 +43,16 @@ colnames(whoop_edit2)
 
 cor(whoop_edit2[c("strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal", "hrv", "restHR", "timeInBed", "timeLightSleep", "timeREMSleep", "timeDeepSleep", "totalSleep", "sleepCycles")])
 
+# data frame to edit date column
+library(lubridate)
+date_whoop_edit = whoop_edit2
+class(date_whoop_edit$date)
+
+date_whoop_edit$date = dmy(date_whoop_edit$date)
+class(date_whoop_edit$date)
+str(date_whoop_edit)
+
+
 #load ggplot libary
 library(ggplot2)
 ggplot(whoop_edit2, aes(x = whoop_edit2$hrv)) + geom_histogram()
