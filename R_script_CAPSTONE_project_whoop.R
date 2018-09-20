@@ -54,7 +54,16 @@ str(date_whoop_edit)
 
 whoop_edit3 = date_whoop_edit
 
-cor(whoop_edit3$hrv, whoop_edit3$recovery)
+# delete observation with NA
+whoop_edit4 = whoop_edit3[-22, ]
+View(whoop_edit4)
+
+cor(whoop_edit4$hrv, whoop_edit4$recovery)
+
+# generate value to replace NA in sleepCycle column
+na_value_sleepcyc = as.integer(mean(whoop_edit4$sleepCycles, na.rm = TRUE))
+whoop_edit4[6, 15] = na_value_sleepcyc
+cor(whoop_edit4[c("strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal", "hrv", "restHR", "timeInBed", "timeLightSleep", "timeREMSleep", "timeDeepSleep", "totalSleep", "sleepCycles")])
 
 
 #load ggplot libary
