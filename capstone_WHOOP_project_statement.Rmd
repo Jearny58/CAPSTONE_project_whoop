@@ -1,0 +1,23 @@
+---
+title: "WHOOP Project Statement"
+output: html_notebook
+---
+
+The WHOOP wearable provides the serious athlete with a wealth of data. At the surface, it may seem simplistic in its approach; two primary metrics are provided to the user, Strain and Recovery, which show, respectively, how strenuous that particular day has been and how well the body has responded and recovered from the previous days stimulus. 
+
+Yet, this is just the beginning. These scores are derived from underlying markers, which include:
+- average heart rate
+- max heart rate achieved that day
+- calories burned
+- sleep performance
+- total time spent in bed and asleep
+- total time spent in light, REM, and deep(SWS) stages of sleep
+- total sleep cycles
+- heart-rate variability (HRV)
+- resting heart rate (RHR)
+- disturbances during sleep
+- sleep latency (i.e. how long it took to fall asleep)
+
+As you can see there is a lot more than meets the eye. Personally, the return on investment I have seen in improved athletic performance, sleep patterns and overall well
+
+ROI of information based on biological markers?
