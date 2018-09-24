@@ -68,17 +68,17 @@ cor(whoop_edit4[c("strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal"
 
 #load ggplot libary
 library(ggplot2)
-ggplot(whoop_edit3, aes(x = date, y = hrv)) + geom_smooth() 
-ggplot(whoop_edit3, aes(x = timeREMSleep, y = sleepCycles, col = strain)) + geom_jitter() + stat_smooth(method = "loess")
-ggplot(whoop_edit3, aes(x = timeDeepSleep, y = hrv)) + geom_jitter()
-ggplot(whoop_edit3, aes(x = sleepCycles, y = hrv)) + geom_jitter() + stat_smooth(method = "lm")
-ggplot(whoop_edit3, aes(x = timeREMSleep, y = hrv)) + geom_jitter() + stat_smooth()
-ggplot(whoop_edit3, aes(x = strain, y = cal)) + geom_jitter()
-ggplot(whoop_edit3, aes(x = whoop_edit3$averHR, y = whoop_edit3$sleepPerform)) + geom_jitter()
-ggplot(whoop_edit3, aes(x = restHR, y = sleepPerform)) + geom_jitter()
-ggplot(whoop_edit3, aes(x = restHR, y = recovery)) + geom_jitter()
-ggplot(whoop_edit3, aes(x = hrv, y = recovery)) + geom_jitter()
-ggplot(whoop_edit3, aes(x = strain, y = restHR)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = date, y = hrv)) + geom_smooth() 
+ggplot(whoop_edit4, aes(x = timeREMSleep, y = sleepCycles, col = strain)) + geom_jitter() + stat_smooth(method = "loess")
+ggplot(whoop_edit4, aes(x = timeDeepSleep, y = hrv)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = sleepCycles, y = hrv)) + geom_jitter() + stat_smooth(method = "lm")
+ggplot(whoop_edit4, aes(x = timeREMSleep, y = hrv)) + geom_jitter() + stat_smooth()
+ggplot(whoop_edit4, aes(x = strain, y = cal)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = whoop_edit3$averHR, y = whoop_edit3$sleepPerform)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = restHR, y = sleepPerform)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = restHR, y = recovery)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = hrv, y = recovery)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = strain, y = restHR)) + geom_jitter()
 
 
 ggplot(whoop_edit2, aes(x = whoop_edit2$hrv)) + geom_histogram()
