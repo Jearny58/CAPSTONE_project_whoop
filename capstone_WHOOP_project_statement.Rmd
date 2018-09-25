@@ -18,6 +18,18 @@ Yet, this is just the beginning. These scores are derived from underlying marker
 - disturbances during sleep
 - sleep latency (i.e. how long it took to fall asleep)
 
-As you can see there is a lot more than meets the eye. Personally, the return on investment I have seen in improved athletic performance, sleep patterns and overall well
+As you can see there is a lot more than meets the eye. Personally, the return on investment I have seen in improved athletic performance, better sleep patterns and overall wellness have been amazing. 
+
+I can now start to pinpoint the areas where I'm doing well...and the areas I'm struggling in. One of the key features for WHOOP is your ability to adapt your training to your current state. Every morning WHOOP takes the data it gathered while you slept and generates your Recovery score (which is based on markers I listed above, like HRV, RHR and sleep performance). There are three zones: green, yellow and red. If your score (which is listed as a percentage out of 100) is in the green it means that your body is primed and ready for higher amounts of strain; if it is in the yellow zone, you should proceed with caution as your body isn't in peak condition; if it is in the red zone, you should consider taking it easy that day with either some active recovery exercises or a 'rest day'. 
+
+This information is extremely useful however the information is useful on more of a day-by-day basis. One morning you could wake up and see that your Recovery score is unexpectedly in the red zone on a day where you had a full day of training planned. 
+
+My Springboard Mentor Jarus Singh and I started wondering: what if, with the previous information gathered from WHOOP over the past few months, we could be predict variables such as Strain, Recovery and Sleep Performance to create a longer term workout plan, say for a week? 
+
+The benefits of this would be significant; you could plan exactly which days during the week you want to go all out, and the days where you take it a little easier to maximize performance. Additionally, it can help in terms of scheduling training around life events; after all you don't want to cut short, or even eliminate, a training session on a day where you're in the green zone and are thus leaving potential gains on the table! Instead, if you know that you're going to have a work party on Thursday, you can plan your training around that so Thursday is an active recovery/rest day and you won't have to worry about missing out on training and can fully enjoy the party! 
+
+My initial exploratory analysis has picked up some interesting trends. Based off of these trends, I'll take a deeper dive and explore how I might be able to predict unknown values for variables such as Strain, Recovery and Sleep Performanceby utilizing a linear regression model. Based on the strength of the model, I'll continue futher by creating a training and test data set and see what the results are.
+
+
 
 ROI of information based on biological markers?

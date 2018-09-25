@@ -74,28 +74,79 @@ ggplot(whoop_edit4, aes(x = timeDeepSleep, y = hrv)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = sleepCycles, y = hrv)) + geom_jitter() + stat_smooth(method = "lm")
 ggplot(whoop_edit4, aes(x = timeREMSleep, y = hrv)) + geom_jitter() + stat_smooth()
 ggplot(whoop_edit4, aes(x = strain, y = cal)) + geom_jitter()
-ggplot(whoop_edit4, aes(x = whoop_edit3$averHR, y = whoop_edit3$sleepPerform)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = averHR, y = sleepPerform)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = restHR, y = sleepPerform)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = restHR, y = recovery)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = hrv, y = recovery)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = strain, y = restHR)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = hrv, y = strain)) + geom_jitter()
+ggplot(whoop_edit4, aes(x = sleepPerform, y = recovery)) + geom_jitter()
+
+ggplot(whoop_edit4, aes(x = hrv, color = sleepPerform)) + geom_histogram()
+
+# linear regression to predict daily strain w/ maxHR, averHR, cal as independent variables
+strainReg = lm(strain ~ maxHR + averHR + cal, data = whoop_edit4)
+summary(strainReg)
+
+# linear regression with averHR removed
+strainReg2 = lm(strain ~ maxHR + cal, data = whoop_edit4)
+summary(strainReg2)
+
+# function for first linear regression strainReg
+total_daily_strain = function(maxHR, averHR, cal) {
+  daily_strain = -13.951038 + maxHR*0.066266 + averHR*0.070551 + cal*0.003163
+  print(daily_strain)
+}
+
+# linear regression function for strainReg2
+total_daily_strain2 = function(maxHR, cal) {
+  daily_strain2 = -11.03 + maxHR*0.07066 + cal*0.003512
+  print(daily_strain2)
+}
+
+total_daily_strain(180, 70, 3500)
+total_daily_strain2(180, 3500)
+
+# linear regression to predict recovery w/ hrv as independent variable
+recoveryReg = lm(recovery ~ hrv + sleepPerform, data = whoop_edit4)
+summary(recoveryReg)
+
+# linear regression to predict sleepPerform using stages of sleep (primarily)
+sleepPerfomReg = lm(sleepPerform ~ timeInBed + timeLightSleep + timeREMSleep + timeDeepSleep + totalSleep + sleepCycles, data = whoop_edit4)
+summary(sleepPerfomReg)
+
+sleepPerfomReg2 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_edit4)
+summary(sleepPerfomReg2)
+
+sleepPerformReg3 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep, data = whoop_edit4)
+summary(sleepPerformReg3)
+
+# function based off of coefficients in sleepPerformReg3
+sleepPerformFunc = function(timeLightSleep, timeREMSleep, timeDeepSleep) {
+  sleepPerform = 0.108315 + timeLightSleep*0.102344 + timeREMSleep*0.069088 + timeDeepSleep*0.100641
+  print(sleepPerform)
+}
+
+# linear regress to predict sleepPerform using total time spent in bed and sleeping
+sleepPerformReg4 = lm(sleepPerform ~ timeInBed + totalSleep + sleepCycles, data = whoop_edit4)
+summary(sleepPerformReg4)
+
+sleepPerformReg5 = lm(sleepPerform ~ timeInBed + totalSleep, data = whoop_edit4)
+summary(sleepPerformReg5)
+
+# function based off of coefficients in sleepPerformReg5
+sleepPerformFunc_total = function(timeInBed, totalSleep) {
+  sleep_perform = 0.10689 + timeInBed*0.03181 + 0.06182*totalSleep
+  print(sleep_perform)
+}
 
 
-ggplot(whoop_edit2, aes(x = whoop_edit2$hrv)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$recovery)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$sleepPerform)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$sleepPerform, y = whoop_edit2$recovery)) + scale_x_log10() + scale_y_log10() + geom_jitter()
-ggplot(whoop_edit2, aes(x = whoop_edit2$strain)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$cal)) + geom_histogram()
-ggplot(whoop_edit2, aes(x = whoop_edit2$maxHR, y = whoop_edit2$strain)) + geom_jitter()
-ggplot(whoop_edit2, aes(x = whoop_edit2$averHR, y = whoop_edit2$strain, color = whoop_edit2$sleepPerform)) + geom_jitter()
-ggplot(whoop_edit2, aes(x = whoop_edit2$averHR, y = whoop_edit2$restHR)) + geom_jitter()
-ggplot(whoop_edit2, aes(x = whoop_edit2$averHR, y = whoop_edit2$sleepPerform)) + geom_jitter()
 
 
-#ggplot(df_original, aes(x = df_original$Calories)) + geom_histogram()
-#ggplot(df_original, aes(x = df_original$Total.Sleep..hrs.)) + geom_histogram()
-#ggplot(df_original, aes(x = df_original$Sleep.Cycles)) + geom_histogram()
-#ggplot(df_original, aes(x = df_original$Strain)) + geom_histogram()
-#ggplot(df_original, aes(x = df_original$Calories, y = df_original$Time.in.Bed..hrs.)) + geom_point()
-#ggplot(df_original, aes(x = df_original$Strain, y = df_original$Recovery)) + geom_point()
+longerSleepRecovery = subset(whoop_edit4, totalSleep > 8.0)
+summary(longerSleepRecovery)
+str(longerSleepRecovery)
+mean(longerSleepRecovery$recovery)
+
+maxHR_above150 = subset(whoop_edit4, maxHR > 150)
+summary(maxHR_above150)
