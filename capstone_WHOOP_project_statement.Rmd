@@ -30,6 +30,25 @@ The benefits of this would be significant; you could plan exactly which days dur
 
 My initial exploratory analysis has picked up some interesting trends. Based off of these trends, I'll take a deeper dive and explore how I might be able to predict unknown values for variables such as Strain, Recovery and Sleep Performanceby utilizing a linear regression model. Based on the strength of the model, I'll continue futher by creating a training and test data set and see what the results are.
 
+SPRINGBOARD PROJECT: SUBMIT YOUR CAPSTONE PROJECT PROPOSAL
+
+What is the problem you want to solve?
+--> Inability to plan out workouts for longer time intervals (i.e. weekly); currently only able to adapt training on a day-to-day basis based on Recovery score. 
+
+Who is your client and why do they care about this problem? In other words, what will your client DO or DECIDE based on your analysis that they wouldn’t have otherwise?
+--> My current client is Myself. However, depending on how well the model(s) can predict future variables of Strain, Recovery and Sleep Performance, this could possibly apply to fellow WHOOP users. If it displays the ability to adequately predict these variables, it would allow them to schedule their training more efficiently around life events.
+
+What data are you going to use for this? How will you acquire this data?
+--> I am going to use my own data from WHOOP. I will acquire the data via WHOOP's online platform that records the variables I listed above (see underlying markers) on a daily basis. I have created an Excel spreadsheet that has an observation for each variable for the past four months. 
+
+In brief, outline your approach to solving this problem (knowing that this might change later).
+1. Exploratory analysis utilizing ggplot package to gain a better idea of how the data looks visually
+2. Review variables that showcase potential relationships and determine the correlation
+3. Create linear regression models for Strain, Recovery and Sleep Performance based on markers that show correlation with these respective variables
+
+What are your deliverables? Typically, this would include code, along with a paper and/or a slide deck.
+Right now, my deliverables would be an R script with accompanying data set that walks through the process of ascertaining and testing variables and their correlations. Once a more concrete relationship has been shown, I will then try to determine how to combine these models to produce an overencompasing model that is able to show the user a daily snapshot of Strain, Recovery and Sleep Performance dependent on input via correlated biological markers that have been shown to have statistically significant effect on said variables. Lastly, I will write a detailed report of my research of the biological markers and resulting thought process that led me to create the model for predicting Strain, Recovery and Sleep performance. 
 
 
-ROI of information based on biological markers?
+
+Look into later --> ROI of information based on biological markers?
