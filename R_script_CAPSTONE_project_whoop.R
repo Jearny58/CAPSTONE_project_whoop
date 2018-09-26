@@ -43,6 +43,8 @@ colnames(whoop_edit2)
 
 cor(whoop_edit2[c("strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal", "hrv", "restHR", "timeInBed", "timeLightSleep", "timeREMSleep", "timeDeepSleep", "totalSleep", "sleepCycles")])
 
+
+
 # data frame to edit date column
 library(lubridate)
 date_whoop_edit = whoop_edit2
@@ -65,6 +67,22 @@ na_value_sleepcyc = as.integer(mean(whoop_edit4$sleepCycles, na.rm = TRUE))
 whoop_edit4[6, 15] = na_value_sleepcyc
 cor(whoop_edit4[c("strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal", "hrv", "restHR", "timeInBed", "timeLightSleep", "timeREMSleep", "timeDeepSleep", "totalSleep", "sleepCycles")])
 
+# exploratory analysis
+summary(whoop_edit4)
+meanHRV = mean(whoop_edit4$hrv)
+meanTimeSleep = mean(whoop_edit4$totalSleep)
+
+ggplot(whoop_edit4, aes(x = totalSleep, y = sleepPerform)) + 
+  geom_jitter()
+
+ggplot(whoop_edit4, aes(x = totalSleep, y = recovery)) + 
+  geom_jitter()
+
+whoop_edit4 %>%
+  filter(hrv > meanHRV) %>%
+  ggplot(aes(x = hrv, y = sleepPerform)) + 
+  geom_jitter()
+  
 
 #load ggplot libary
 library(ggplot2)
@@ -82,7 +100,7 @@ ggplot(whoop_edit4, aes(x = strain, y = restHR)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = hrv, y = strain)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = sleepPerform, y = recovery)) + geom_jitter()
 
-ggplot(whoop_edit4, aes(x = hrv, color = sleepPerform)) + geom_histogram()
+
 
 # linear regression to predict daily strain w/ maxHR, averHR, cal as independent variables
 strainReg = lm(strain ~ maxHR + averHR + cal, data = whoop_edit4)

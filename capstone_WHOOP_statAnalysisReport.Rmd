@@ -1,0 +1,177 @@
+---
+title: "Short Report on Statistical Analysis"
+author: "Joe Earnshaw"
+date: "9/26/2018"
+output: html_document
+---
+Project: Submit a short report on your statistical analysis
+Now let's write down our findings in a short document. This document will become part of your milestone report, and eventually your final project report.
+
+--> Summarize the most interesting or important findings from your analysis in a short (2-3 page) document. You may use any format of your choice (R Markdown, Google Docs, Word etc)
+--> Add this document to the github repository for your project
+--> Submit a link to this document
+
+First I want to start by giving a simple summary of the data so far, which will include the min, 1st quartile, median, mean, 3rd quartile and max for each variable (date is irrelevant in regards to summary statistics). See below to run the R code to output the above information for the following variables:
+
+--> strain
+--> recovery
+--> sleep performance (sleepPerform)
+--> maxHR (max heart rate)
+--> averHR (average heart rate)
+--> cal (calories burned)
+--> hrv (heart rate variability)
+--> restHR (resting heart rate)
+--> timeInBed (total time spent in bed, awake & asleep)
+--> timeLightSleep (time spent in light sleep stage)
+--> timeREMSleep (time spent in REM sleep stage)
+--> timeDeepSleep (time spent in SWS-Deep sleep stage)
+--> totalSleep (total time spent asleep)
+--> sleepCycles (number of cycles completed through each successive sleep stage, Light to REM to Deep)
+
+```{r}
+summary(whoop_edit4)
+```
+
+My first takeaway from the data is in regards to my total sleep. With a median of 7.190 hrs and mean of 6.930 hrs, for this 4 month period I would rate my overall sleep performance as 'needs improvement'. Matthew Walker, a neuroscientist and director of the Center for Human Sleep Science at UC Berkeley, has stated that the vast majority of people need between seven and nine hours of sleep a night (at minimum). While I am technically pretty close to that range, I would still say the amount of sleep I am getting is inadequate, due to a training schedule that is anywhere from 1-3 hrs a day, 5-6 times a week. Higher strain puts greater stress on the body and when is essentially the only time our bodies have time to recover? You guessed it, when we sleep. 
+
+Then if you take a look at the 'recovery' variable you will see that this lack of sleep may indeed be having a negative impact on my performance. With a mean and median recovery score of 0.5902 and 0.6000 (expressed here as a decimal; in WHOOP it is displayed as a % out of 100, with 0% being the lowest score and 100% being the highest), respectively, it appears that my recovery's have not been all that great. In fact, this puts me in the 'yellow zone', where I have to be very conscious of not putting too much strain on my body that particular day. By seeing these numbers, I'm able to get actionable insights right away and the first key takeaway is that I need to create more time in my schedule for sleep, whether that be more devoted time in bed at night or by utilizing naps during the day. 
+
+The next variable I want to look at is heart-rate variability. First, some background is necessary before taking a deeper dive into how HRV is a good indicator of how well your body is able to take on strain on any given day. On a high level, heart-rate variability, or HRV, is a measure of irregularity in the heart rate(1). Essentially, the heart doesn't have a perfect rythym and does not beat in perfect intervals. Instead there is some variability in the time between heartbeats, which is called the RR-interval, and HRV is a function fo the difference in the lengths of successive beats in a series of these intervals(1). 
+
+Yet, what controls this variation? Well I'm glad you asked! HRV is largely controlled by the autonomic nervous system (ANS), which then can be subdivided into two components, the sympathetic (i.e. fight-or-flight mechanism) and parasympathetic (i.e. relaxtion or 'rest-and-digest' mechanism) nervous system(2). The hypothalamus, a part of our brain that is constantly processing information, sends signals, through the ANS to either stimulate or relax it. Now this is where HRV comes back into play as it is able to detect if there any imbalances between your fight-or-flight and rest-and-digest responses. Here is an excerpt from Harvard Medical School that further describes why we should check HRV:
+
+"HRV is an interesting and noninvasive way to identify these ANS imbalances. If a person’s system is in more of a fight-or-flight mode, the variation between subsequent heartbeats is low. If one is in a more relaxed state, the variation between beats is high. In other words, the healthier the ANS the faster you are able to switch gears, showing more resilience and flexibility."
+
+So HRV is not only a great tracker for overall fitness, but lifestyle as well. This is why I then looked at the numbers regarding my HRV. (See below for a boxp)
+
+```{r}
+library(ggplot2)
+summary(whoop_edit4$hrv)
+
+fill <- "#4271AE"
+line <- "#1F3552"
+
+ggplot(data = whoop_edit4, aes(x = "", y = hrv)) + 
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) +
+  scale_y_continuous(name = "HRV", breaks = seq(40, 115, 10), limits = c(40, 115))
+```
+
+As I can see from the box plot it looks like my HRV tends to stay somewhere between 60 and approximately 80. What about the distribution of my HRV, are there any insights in terms of the distribution of the values? 
+
+```{r}
+library(ggplot2)
+
+ggplot(whoop_edit4, aes(x = hrv)) + 
+  geom_histogram(binwidth = 5, aes(y = ..density..)) + 
+  stat_function(fun = dnorm, color = "red",
+                args = list(mean = mean(whoop_edit4$hrv, na.rm = TRUE),
+                           sd = sd(whoop_edit4$hrv, na.rm = TRUE)))
+```
+So it looks like my HRV (approximately) follows a normal distribution! 
+
+Now I have a good idea of where my HRV stands overall, but what about its trend? What is it's general trend over these 4 months?
+
+```{r}
+library(ggplot2)
+
+ggplot(whoop_edit4, aes(x = date, y = hrv)) + 
+  geom_point(alpha = 0.5) 
+
+```
+Ok so it looks like my HRV has been fluctuating quite a bit over the past few months. Yet, it looks like there might be a slight positive trend, which is a good thing. 
+
+The next thing I want to look into is the connection between HRV and recovery, and see if there was in fact a connection between the two. So I started by looking at the correlation between the two. The result was 0.9198956, which lines up pretty nicely with what the research and WHOOP said about HRV being a good indicator of the body's preparedness for strain. Additionally, the visual analysis further shows the strong positive correlation between the two variables, i.e. the higher my HRV, the higher my recovery score was. 
+```{r}
+library(ggplot2)
+
+cor(whoop_edit4$hrv, whoop_edit4$recovery)
+
+ggplot(whoop_edit4, aes(x = hrv, y = recovery)) + 
+  geom_point(alpha = 0.5)
+
+```
+
+Ok so there is a reasonably strong connection between hrv and recovery, which in a way confirms something we already knew coming in. Now, let's dive a little deeper into the variables available to see if there are any interesting insights we might be able to gain from further analysis. 
+
+Now lets take a look into the one of the other heart-related recovery variables: resting heart rate. First lets get a basic overview through a boxplot and histogram of the values of resting heart rate.
+```{r}
+library(ggplot2)
+summary(whoop_edit4$restHR)
+
+fill <- "#4271AE"
+line <- "#1F3552"
+
+ggplot(data = whoop_edit4, aes(x = "", y = restHR)) + 
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) +
+  scale_y_continuous(name = "Resting Heart Rate", breaks = seq(35, 70, 5), limits = c(35, 70))
+```
+
+Now here is the histogram of resting heart rate.
+```{r}
+library(ggplot2)
+
+ggplot(whoop_edit4, aes(x = restHR)) + 
+  geom_histogram(binwidth = 2, aes(y = ..density..)) + 
+  stat_function(fun = dnorm, color = "red",
+                args = list(mean = mean(whoop_edit4$restHR, na.rm = TRUE),
+                           sd = sd(whoop_edit4$restHR, na.rm = TRUE)))
+```
+
+So it looks like there is a slight right-skew in regards to my resting heart rate, which means there a more lower values (i.e. lower heart rates), which is a good thing! Resting heart rate has been shown to be a good snapshot of how your heart muscle is functioning and that in certain cases, according to Dr. Jason Wasfy of Harvard-affiliated Massachusetts General Hospital Heart Center, "a lower RHR can mean a higher degree of physical fitness, which is associated with reduced rates of cardiac events like heart attacks"(3). So yay to no heart attacks (or at least a less likely chance of one)! 
+
+Taking a further look into resting heart rate, are there any connections between it and recovery? Let's find out. 
+```{r}
+library(ggplot2)
+
+ggplot(whoop_edit4, aes(x = restHR, y = recovery)) +
+  geom_point(alpha = 0.5, position = "jitter")
+```
+While not as strong as HRV and recovery, resting heart rate does appear to have a pretty solid negative correlation with recovery, i.e. the higher your resting heart rate, the lower your recovery score on WHOOP. 
+
+Up to this point, we've been looking largely into recovery. Let's switch gears and look into Strain, which is the variable that showcases accumulated cardiovascular load over the span of a day. This variable ranges from 0-21, with 0 being absolutely no strain and 21 being all-out, max effort. 
+
+Let's begin by taking a deeper dive into the summary statistics of Strain.
+```{r}
+library(ggplot2)
+summary(whoop_edit4$strain)
+
+fill <- "#4271AE"
+line <- "#1F3552"
+
+ggplot(data = whoop_edit4, aes(x = "", y = strain)) + 
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) +
+  scale_y_continuous(name = "Strain", breaks = seq(0, 21, 3), limits = c(0, 21))
+
+ggplot(whoop_edit4, aes(x = strain)) + 
+  geom_histogram(binwidth = 1, aes(y = ..density..)) + 
+  stat_function(fun = dnorm, color = "red",
+                args = list(mean = mean(whoop_edit4$strain, na.rm = TRUE),
+                           sd = sd(whoop_edit4$strain, na.rm = TRUE)))
+```
+So it looks like my Strain has a tendency to be between approx. 7 and 13 (out of 21). Yet, when you take a look at it's histogram, there looks to be two local maxima, making it a bimodal distribution. What this is telling me is that there might be two groups here, with the lower centered around days I took it easy (i.e. rest days) and days I trained a little bit harder. 
+
+Looking at Strain in the context of heart rate, there are two variables that we have access to that may prove useful in analysis: average heart rate and max heart rate. The theory here is that the higher the average heart rate/ max heart rate, the harder you worked that day and thus the higher strain you would have. Let's take a look. 
+```{r}
+library(ggplot2)
+
+ggplot(whoop_edit4, aes(x = averHR, y = strain)) +
+  geom_point(alpha = 0.5, position = "jitter")
+
+ggplot(whoop_edit4, aes(x = maxHR, y = strain)) + 
+  geom_point(alpha = 0.5)
+```
+
+So it looks like there appears to be a pretty strong positive correlation between the two! 
+
+
+
+
+
+
+
+
+
+
+(1) https://www.whoop.com/the-locker/an-athletes-guide-to-hrv/?gclid=Cj0KCQjw3KzdBRDWARIsAIJ8TMRAgo8EOPlnujmFKGPoqavNn75jrJfOYJOKkG4aV5R9IpZmPOcDkwwaAnxiEALw_wcB
+(2) https://www.health.harvard.edu/blog/heart-rate-variability-new-way-track-well-2017112212789 
+(3) https://www.health.harvard.edu/blog/resting-heart-rate-can-reflect-current-future-health-201606179806 
