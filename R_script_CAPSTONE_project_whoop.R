@@ -153,7 +153,7 @@ train_set = shuffled[train_indices, ]
 test_indices = (round(0.75 * n) + 1):n
 test_set = shuffled[test_indices, ]
 
-# strain prediction for regression model
+# strain prediction for strainReg2
 strainPrediction = predict(strainReg2, newdata = test_set)
 strainPrediction
 
@@ -167,6 +167,7 @@ predict_R2
 recoveryReg = lm(recovery ~ hrv + sleepPerform, data = whoop_edit4)
 summary(recoveryReg)
 
+# recovery prediction for recoveryReg
 recoveryPrediction = predict(recoveryReg, newdata = test_set)
 recoveryPrediction
 
@@ -204,7 +205,7 @@ sleepPerformFunc_total = function(timeInBed, totalSleep) {
   print(sleep_perform)
 }
 
-# sleep prediction for regression model
+# sleep prediction for sleepPerformReg5
 sleepPredict = predict(sleepPerformReg5, newdata = test_set)
 sleepPredict
 
