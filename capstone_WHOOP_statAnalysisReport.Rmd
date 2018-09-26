@@ -207,7 +207,6 @@ line <- "#1F3552"
 
 ggplot(data = whoop_edit4, aes(x = "", y = sleepPerform)) + 
   geom_boxplot(fill = fill, color = line, alpha = 0.7) 
-#  scale_y_continuous(name = "Strain", breaks = seq(0, 21, 3), limits = c(0, 21))
 
 ggplot(whoop_edit4, aes(x = sleepPerform)) + 
   geom_histogram(binwidth = 0.05, aes(y = ..density..)) + 
@@ -229,7 +228,6 @@ line <- "#1F3552"
 
 ggplot(data = whoop_edit4, aes(x = "", y = timeInBed)) + 
   geom_boxplot(fill = fill, color = line, alpha = 0.7) 
-#  scale_y_continuous(name = "Strain", breaks = seq(0, 21, 3), limits = c(0, 21))
 
 ggplot(whoop_edit4, aes(x = timeInBed)) + 
   geom_histogram(binwidth = 1, aes(y = ..density..)) + 
@@ -248,7 +246,6 @@ line <- "#1F3552"
 
 ggplot(data = whoop_edit4, aes(x = "", y = totalSleep)) + 
   geom_boxplot(fill = fill, color = line, alpha = 0.7) 
-#  scale_y_continuous(name = "Strain", breaks = seq(0, 21, 3), limits = c(0, 21))
 
 ggplot(whoop_edit4, aes(x = totalSleep)) + 
   geom_histogram(binwidth = 0.5, aes(y = ..density..)) + 
