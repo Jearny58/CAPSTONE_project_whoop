@@ -100,6 +100,8 @@ ggplot(whoop_edit4, aes(x = strain, y = restHR)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = hrv, y = strain)) + geom_jitter()
 ggplot(whoop_edit4, aes(x = sleepPerform, y = recovery)) + geom_jitter()
 
+ggplot(whoop_edit4, aes(x = maxHR, y = cal)) + 
+  geom_point()
 
 
 # linear regression to predict daily strain w/ maxHR, averHR, cal as independent variables
@@ -109,6 +111,10 @@ summary(strainReg)
 # linear regression with averHR removed
 strainReg2 = lm(strain ~ maxHR + cal, data = whoop_edit4)
 summary(strainReg2)
+
+ggplot(whoop_edit4, aes(x = maxHR, y = cal)) + 
+  geom_point()
+
 
 # function for first linear regression strainReg
 total_daily_strain = function(maxHR, averHR, cal) {
@@ -122,12 +128,52 @@ total_daily_strain2 = function(maxHR, cal) {
   print(daily_strain2)
 }
 
+# Sum squared errors
+strainReg2$residuals
+strainReg2SSE = sum(strainReg2$residuals^2)
+strainReg2SSE
+
+# Root mean square error for strainReg2
+strainReg2_RMSE = sqrt(strainReg2SSE/nrow(whoop_edit4))
+strainReg2_RMSE
+
 total_daily_strain(180, 70, 3500)
 total_daily_strain2(180, 3500)
+
+# attempt at creating training and test set for strain regression
+set.seed(1)
+
+n = nrow(whoop_edit4)
+shuffled = whoop_edit4[sample(n), ]
+
+# split data into train and test
+train_indices = 1:round(0.75 * n)
+train_set = shuffled[train_indices, ]
+
+test_indices = (round(0.75 * n) + 1):n
+test_set = shuffled[test_indices, ]
+
+# strain prediction for regression model
+strainPrediction = predict(strainReg2, newdata = test_set)
+strainPrediction
+
+# sum squared errors & total sums of squares
+predict_SSE = sum((strainPrediction - test_set$strain)^2)
+predict_SST = sum((mean(whoop_edit4$strain) - test_set$strain)^2)
+predict_R2 = 1 - predict_SSE/predict_SST
+predict_R2
 
 # linear regression to predict recovery w/ hrv as independent variable
 recoveryReg = lm(recovery ~ hrv + sleepPerform, data = whoop_edit4)
 summary(recoveryReg)
+
+recoveryPrediction = predict(recoveryReg, newdata = test_set)
+recoveryPrediction
+
+recoveryPredict_SSE = sum((recoveryPrediction - test_set$recovery)^2)
+recoveryPredict_SST = sum((mean(whoop_edit4$recovery) - test_set$recovery)^2)
+recoveryPredict_R2 = 1 - recoveryPredict_SSE/recoveryPredict_SST
+recoveryPredict_R2
 
 # linear regression to predict sleepPerform using stages of sleep (primarily)
 sleepPerfomReg = lm(sleepPerform ~ timeInBed + timeLightSleep + timeREMSleep + timeDeepSleep + totalSleep + sleepCycles, data = whoop_edit4)
@@ -158,13 +204,12 @@ sleepPerformFunc_total = function(timeInBed, totalSleep) {
   print(sleep_perform)
 }
 
+# sleep prediction for regression model
+sleepPredict = predict(sleepPerformReg5, newdata = test_set)
+sleepPredict
 
+sleepPredict_SSE = sum((sleepPredict - test_set$sleepPerform)^2)
+sleepPredict_SST = sum((mean(whoop_edit4$sleepPerform) - test_set$sleepPerform)^2)
+sleepPredict_R2 = 1 - sleepPredict_SSE/sleepPredict_SST
+sleepPredict_R2
 
-
-longerSleepRecovery = subset(whoop_edit4, totalSleep > 8.0)
-summary(longerSleepRecovery)
-str(longerSleepRecovery)
-mean(longerSleepRecovery$recovery)
-
-maxHR_above150 = subset(whoop_edit4, maxHR > 150)
-summary(maxHR_above150)
