@@ -161,15 +161,101 @@ ggplot(whoop_edit4, aes(x = maxHR, y = strain)) +
   geom_point(alpha = 0.5)
 ```
 
-So it looks like there appears to be a pretty strong positive correlation between the two! 
+So it looks like there appears to be a pretty strong positive correlation between the two! Let's check it out via the cor() function. With a correlation of 0.8253186 (averHR) and 0.8289397 (maxHR), this confirms that there is a strong relationship between average heart rate, max heart rate and strain, which makes sense. 
+```{r}
+cor(whoop_edit4$averHR, whoop_edit4$strain)
+cor(whoop_edit4$maxHR, whoop_edit4$strain)
+```
 
+Another variable that I'm interested in looking at is calories. 
+```{r}
+library(ggplot2)
+summary(whoop_edit4$cal)
 
+fill <- "#4271AE"
+line <- "#1F3552"
 
+ggplot(data = whoop_edit4, aes(x = "", y = cal)) + 
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) 
 
+ggplot(whoop_edit4, aes(x = cal)) + 
+  geom_histogram(binwidth = 200, aes(y = ..density..)) + 
+  stat_function(fun = dnorm, color = "red",
+                args = list(mean = mean(whoop_edit4$cal, na.rm = TRUE),
+                           sd = sd(whoop_edit4$cal, na.rm = TRUE)))
+```
 
+So it looks like the histogram is showing a bimodal distribution, which would correpond nicely with the 'rest day/active day' hypothesis that we gathered from the histogram of Strain. Let's see the relationship between the two. 
+```{r}
+library(ggplot2)
 
+ggplot(whoop_edit4, aes(x = cal, y = strain)) +
+  geom_point(alpha = 0.5)
+```
 
+There looks to be a few outliers but overall there appears to be a strong positive correlation between calories burned and strain, which makes intuitive sense considering that the more active you are the more calories your body is likely to burn. 
 
+The last thing I wanted to take an exploratory look at was the sleep metrics, which include sleep performance, the times spent in the various sleep stages and sleep cycles. 
+
+First let's take a look at the distribution of my sleep performances.
+```{r}
+library(ggplot2)
+summary(whoop_edit4$sleepPerform)
+
+fill <- "#4271AE"
+line <- "#1F3552"
+
+ggplot(data = whoop_edit4, aes(x = "", y = sleepPerform)) + 
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) 
+#  scale_y_continuous(name = "Strain", breaks = seq(0, 21, 3), limits = c(0, 21))
+
+ggplot(whoop_edit4, aes(x = sleepPerform)) + 
+  geom_histogram(binwidth = 0.05, aes(y = ..density..)) + 
+  stat_function(fun = dnorm, color = "red",
+                args = list(mean = mean(whoop_edit4$sleepPerform, na.rm = TRUE),
+                           sd = sd(whoop_edit4$sleepPerform, na.rm = TRUE)))
+```
+
+From the histogram, it looks like there is a tendency towards good sleep performances! This kind of contradicts what I said earlier in regards to my sleep and how I hypothesized that I wasn't getting enough based on strain. This is definitely somthing to look into further. 
+
+Let's go ahead and look at some other sleep variables.
+TIME IN BED
+```{r}
+library(ggplot2)
+summary(whoop_edit4$timeInBed)
+
+fill <- "#4271AE"
+line <- "#1F3552"
+
+ggplot(data = whoop_edit4, aes(x = "", y = timeInBed)) + 
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) 
+#  scale_y_continuous(name = "Strain", breaks = seq(0, 21, 3), limits = c(0, 21))
+
+ggplot(whoop_edit4, aes(x = timeInBed)) + 
+  geom_histogram(binwidth = 1, aes(y = ..density..)) + 
+  stat_function(fun = dnorm, color = "red",
+                args = list(mean = mean(whoop_edit4$timeInBed, na.rm = TRUE),
+                           sd = sd(whoop_edit4$timeInBed, na.rm = TRUE)))
+```
+
+TOTAL SLEEP
+```{r}
+library(ggplot2)
+summary(whoop_edit4$totalSleep)
+
+fill <- "#4271AE"
+line <- "#1F3552"
+
+ggplot(data = whoop_edit4, aes(x = "", y = totalSleep)) + 
+  geom_boxplot(fill = fill, color = line, alpha = 0.7) 
+#  scale_y_continuous(name = "Strain", breaks = seq(0, 21, 3), limits = c(0, 21))
+
+ggplot(whoop_edit4, aes(x = totalSleep)) + 
+  geom_histogram(binwidth = 0.5, aes(y = ..density..)) + 
+  stat_function(fun = dnorm, color = "red",
+                args = list(mean = mean(whoop_edit4$totalSleep, na.rm = TRUE),
+                           sd = sd(whoop_edit4$totalSleep, na.rm = TRUE)))
+```
 
 
 (1) https://www.whoop.com/the-locker/an-athletes-guide-to-hrv/?gclid=Cj0KCQjw3KzdBRDWARIsAIJ8TMRAgo8EOPlnujmFKGPoqavNn75jrJfOYJOKkG4aV5R9IpZmPOcDkwwaAnxiEALw_wcB
