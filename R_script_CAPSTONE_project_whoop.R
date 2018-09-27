@@ -108,6 +108,24 @@ ggplot(whoop_edit4, aes(x = maxHR, y = cal)) +
 strainReg = lm(strain ~ maxHR + averHR + cal, data = whoop_edit4)
 summary(strainReg)
 
+# define what Strain is; how do they calculate it
+# what are the summary stats?
+# --> potentially fit a density curve
+# strain over time
+# do correlation between strain and relevant variables
+# create scatterplot of variables, use geom_point()
+# then...define models
+# create a training and test set
+# overprovide information
+# how do you divide training and test set? 
+# randomize!
+# take first 80 observations 
+# case where not necessarily have to randomize: stratified sampling
+# measures for how good a model works
+# --> information criterion (AIC)
+# --> what is does: guards against overfitting, add additional parameter 
+
+
 # linear regression with averHR removed
 strainReg2 = lm(strain ~ maxHR + cal, data = whoop_edit4)
 summary(strainReg2)
@@ -139,6 +157,15 @@ strainReg2_RMSE
 
 total_daily_strain(180, 70, 3500)
 total_daily_strain2(180, 3500)
+
+# do it the wrong way --> show problem with the model
+# how to fix to randomize:
+# --> caret package --> will do everything for training/test set
+# look into RMSE 
+# ?AIC
+# library(caret) --> extremely powerful
+# anti_join()
+# as you start getting deeper
 
 # attempt at creating training and test set for strain regression
 set.seed(1)
