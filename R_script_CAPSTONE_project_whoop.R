@@ -165,7 +165,6 @@ total_daily_strain2(180, 3500)
 # ?AIC
 # library(caret) --> extremely powerful
 # anti_join()
-# as you start getting deeper
 
 # attempt at creating training and test set for strain regression
 set.seed(1)
