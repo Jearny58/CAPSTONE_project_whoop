@@ -34,7 +34,101 @@ summary(whoop_edit)
 ```
 
 From the first structure call we made, we saw that the values in the Recovery and Sleep perfomance columns were factors. To be able to utilize this data further, we need to convert these values from factors to numerics. 
+```{r}
 
+#new data frame to edit Recovery column; convert from factors to numerics
+whoop_edit_recovery <- whoop_edit
+whoop_edit_recovery$Recovery <- as.numeric(sub("%", "e-2", whoop_edit_recovery$Recovery))
+
+class(whoop_edit_recovery$Recovery)
+whoop_edit_recovery$Recovery
+
+```
+
+The recovery has been switched to a numeric, taking values between 0.00 and 1.00 (with 0.00 representing 0% recovery and 1.00 representing and 100% recovery). With the recovery column changed, we need to address the factors/numeric issue within the sleep performance column as well. 
+```{r}
+# current class of sleep performance column
+class(whoop_edit_recovery$Sleep.Performance)
+
+# new data set to edit sleep performance
+whoop_edit_sleep_perf <- whoop_edit_recovery
+whoop_edit_sleep_perf$Sleep.Performance <- as.numeric(sub("%", "e-2", whoop_edit_sleep_perf$Sleep.Performance))
+head(whoop_edit_sleep_perf$Sleep.Performance)
+
+# check to see that class of sleep performance column has been updated to numeric
+class(whoop_edit_sleep_perf$Sleep.Performance)
+```
+
+The next process in cleaning the data is going to be updating the column names. There isn't anything necessarily wrong with them as is, however the use of uppercase, lowercase and periods is somewhat confusing and may lead to frustration as we go further with the project. So, we're going to update the names of the columns to make them a little easier to work with. 
+
+```{r}
+#save updates to new data frame, whoop_edit2
+whoop_edit2 <- whoop_edit_sleep_perf
+
+# current column names of whoop_edit2 data set
+names(whoop_edit2)
+
+# update to column names of whoop_edit2 data set
+names(whoop_edit2) = c("date", "strain", "recovery", "sleepPerform", "maxHR", "averHR", "cal", "hrv", "restHR", "timeInBed", "timeLightSleep", "timeREMSleep", "timeDeepSleep", "totalSleep", "sleepCycles")
+
+# quick check to be sure that they have been correctly updated
+names(whoop_edit2)
+
+```
+
+To be sure that we understand what each column (and its subsequent data) represents, below is a quick overview of each variable.
+
+VARIABLES IN DATA SET
+--> "date" (Date): day, month and year of observation
+--> "strain" (Strain): cardiovascular load experienced on the respective date
+--> "recovery" (Recovery): body's ability to adapt to training stimulus
+--> "sleepPerform" Sleep perfomance: how recovered the athlete is; largely determined by actual amount of sleep versus recommended amount of sleep need according to daily strain
+--> "maxHR" (Max HR): max heart rate on that respective date
+--> "averHR" (Average HR): average heart over the course of that entire day
+--> "cal" (Calories): approx. calories burned based off of cardiovascular load
+--> "hrv" (HRV): heart rate variability, a measure of fluctuation in the length of the time interval between successive heartbeats
+--> "restHR" (Resting HR): average heart rate during sleeping phase
+--> "timeInBed" (Time in bed): The total amount of time spent in bed, which includes time awake and time in state of sleep
+--> "timeLightSleep" (Light Sleep): approximate amount of time spent in light sleep stage
+--> "timeREMSleep" (REM Sleep): approximate amount of time spent in REM sleep stage
+--> "timeDeepSleep" (SWS Deep Sleep): approximate amount of time spent in SWS Deep sleep 
+--> "totalSleep" (Total Sleep): total amount of time spent sleeping (which includes Light, REM, and SWS Deep sleep)
+--> "sleepCycles" (Sleep cycles): total amount of sleep cycles achieved during that days respective sleep session (1 stage is defined as going from Light, to REM, to SWS Deep sleep without interruption, i.e. waking up, being disturbed, etc.)
+
+Now, the next step is to address the "date" column; currently the observations within that column are factors and we want them to represent actual dates since each one represents the day for which the observed values (see above) apply. 
+
+```{r}
+# load lubridate package to easier manipulate dates
+library(lubridate)
+
+# create data set to edit the "dates" column and see the current class of it 
+date_whoop_edit = whoop_edit2
+class(date_whoop_edit$date)
+
+# editing "date" column using dmy() function ('d' for day, 'm' for month, 'y' for year)
+date_whoop_edit$date = dmy(date_whoop_edit$date)
+
+# confirming changes made to date and checking overall structure of data set
+class(date_whoop_edit$date)
+str(date_whoop_edit)
+
+# create new data set
+(whoop_edit3 = date_whoop_edit)
+```
+
+There are two minor tweaks we still need to make: firstly, we need to eliminate the observation for July 24th because it contains mostly NA's and secondly, we need to replace the NA in the sleep cycles column for the observation on August 9th. We'll replace the sleep cycles observations with the mean of the sleep cycles column for the observed data set. 
+
+```{r}
+# delete July 24th observation with mostly NA's and save it into new data set, whoop_edit4
+whoop_edit4 = whoop_edit3[-22, ]
+
+# generate value to replace NA in sleepCycle column
+na_value_sleepcyc = as.integer(mean(whoop_edit4$sleepCycles, na.rm = TRUE))
+whoop_edit4[6, 15] = na_value_sleepcyc
+
+# check to see data set has been correctly updated
+summary(whoop_edit4)
+```
 
 
 
