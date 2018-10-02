@@ -1,0 +1,41 @@
+---
+title: "Capstone_WHOOP"
+author: "Joe Earnshaw"
+date: "10/1/2018"
+output: html_document
+---
+
+LOAD THE DATA SET PLUS QUICK REVIEW OF IT'S STRUCTURE
+```{r}
+whoop_df_original <- read.csv("capstone_WHOOP_data_14aug_18apr.csv", header = TRUE)
+
+class(whoop_df_original) # shows the class of the whoop_df_original object
+names(whoop_df_original) # names of columns in data frame
+str(whoop_df_original) # compactly displays the internal structure of whoop_df_original
+summary(whoop_df_original) # summary statistics for whoop_df_original
+
+```
+
+STEP 1: CLEANING THE DATA
+As we can see from above, there are 61 NA's in most columns, but only 60 NA's in Date and Strain. Let's dive a little deeper into why this is. 
+```{r}
+whoop_edit <- whoop_df_original
+
+na_whoop_edit = whoop_edit[rowSums(is.na(whoop_edit)) > 0, ]
+View(na_whoop_edit)
+```
+
+So it looks like the vast majority of the observations in na_whoop_edit contain nothing but NA's. From row 120 to 179, there is no information so I will begin by eliminating these rows. 
+
+```{r}
+# remove empty rows 120 - 179
+whoop_edit <- whoop_edit[-c(120:179), ]
+summary(whoop_edit)
+```
+
+From the first structure call we made, we saw that the values in the Recovery and Sleep perfomance columns were factors. To be able to utilize this data further, we need to convert these values from factors to numerics. 
+
+
+
+
+However, there are two rows that contain observations with the dates of August 9, 2018 and July 24, 2018. August 9th's only missing number is in the 'Sleep.Cycles' column. Since it is only one observation, I will correct this by filling it in with the mean number of sleep cycles. As for July 24th, it looks like it is missing most of it's information and due to this I think it best to eliminate this particular observation. 
