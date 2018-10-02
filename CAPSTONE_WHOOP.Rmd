@@ -130,6 +130,34 @@ whoop_edit4[6, 15] = na_value_sleepcyc
 summary(whoop_edit4)
 ```
 
+So now that we have our data set finally cleaned up and ready to go it's time for some initial exploratory analysis! To start we are going to load the ggplot2 package and do some visual analysis to take a deeper dive in the data. First, we'll begin by looking at the data for strain, recovery and sleep performance since these variables are the most important metrics given by WHOOP and ultimately shape how we approach balancing our training with recovery (and sleep!).
+
+```{r}
+#load ggplot libary
+library(ggplot2)
+
+# new data set for exploratory analysis
+whoop_df_explore = whoop_edit4
+
+# boxplot and histogram of strain data
+ggplot(whoop_df_explore, aes(x = "", y = strain)) + 
+  geom_boxplot()
+ggplot(whoop_df_explore, aes(x = strain)) + 
+  geom_histogram(binwidth = 1, color="black", fill="white")
+
+# boxplot and histogram of recovery data
+ggplot(whoop_df_explore, aes(x = "", y = recovery)) + 
+  geom_boxplot()
+ggplot(whoop_df_explore, aes(x = recovery)) + 
+  geom_histogram(color="black", fill="white", binwidth = 0.05)
+
+# boxplot and histogram of sleep performance data
+ggplot(whoop_df_explore, aes(x = "", y = sleepPerform)) + 
+  geom_boxplot()
+ggplot(whoop_df_explore, aes(x = sleepPerform)) + 
+  geom_histogram(color="black", fill="white", binwidth = 0.05)
+```
+
 
 
 However, there are two rows that contain observations with the dates of August 9, 2018 and July 24, 2018. August 9th's only missing number is in the 'Sleep.Cycles' column. Since it is only one observation, I will correct this by filling it in with the mean number of sleep cycles. As for July 24th, it looks like it is missing most of it's information and due to this I think it best to eliminate this particular observation. 
