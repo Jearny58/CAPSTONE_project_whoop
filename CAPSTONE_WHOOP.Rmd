@@ -269,4 +269,51 @@ mean(abs(strain_model_error) < 2 * strain_model_rmse)
 
 The root mean square error for regression says how far typical points are above or below the regression line. The RMSE is to the regression line as the SD is to the average. For instance, if the scatter diagram is football-shaped, about 68% of the points on the scatter diagram will be within one RMSE of the regression line, about 95% of then will be within 2 RMSE of the regression line.
 
+CROSS VALIDATION OF STRAIN MODEL
+```{r}
+# Create a cross-validation plan
+library(vtreat)
+
+# create new data frame for cross validation, based off of previous data frame
+cv_strain_model_df = whoop_df_strain_reg
+
+# function for 3-fold cross validation
+splitPlan = kWayCrossValidation(nrow_whoop_df_regression_test, 3, NULL, NULL)
+str(splitPlan)
+
+# formula for strain linear regression model
+strain_model_formula = as.formula(strain ~ maxHR + averHR + cal)
+strain_model_formula
+```
+
+CONTINUATION OF CROSS VALIDATION 
+
+```{r}
+# number of folds
+k = 3
+
+cv_strain_model_df$strainPredict.cv = 0 
+
+for(i in 1:k) {
+  split = splitPlan[[i]]
+  model = lm(strain_model_formula, data = cv_strain_model_df[split$train, ])
+  cv_strain_model_df$strainPredict.cv[split$app] = predict(model, newdata = cv_strain_model_df[split$app, ])
+}
+
+# predict from a full model
+cv_strain_model_df$strainPredict.cv = predict(strain_model1, data = cv_strain_model_df)
+
+# RMSE for full model's predictions
+cv_strain_model_error = cv_strain_model_df$strainPredict - cv_strain_model_df$strain
+cv_strain_error_squared = cv_strain_model_error^2
+(cv_strain_model_rmse = sqrt(mean(cv_strain_error_squared)))
+
+# RMSE for cross-validation predictions
+cvPredict_strain_model_error = cv_strain_model_df$strainPredict.cv - cv_strain_model_df$strain
+cvPredict_strain_error_squared = cvPredict_strain_model_error^2
+(cvPredict_strain_rmse = sqrt(mean(cvPredict_strain_error_squared)))
+```
+
+
+
 However, there are two rows that contain observations with the dates of August 9, 2018 and July 24, 2018. August 9th's only missing number is in the 'Sleep.Cycles' column. Since it is only one observation, I will correct this by filling it in with the mean number of sleep cycles. As for July 24th, it looks like it is missing most of it's information and due to this I think it best to eliminate this particular observation. 

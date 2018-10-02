@@ -302,8 +302,6 @@ View(train_set_whoop_regression_df)
 # Create a cross-validation plan
 library(vtreat)
 
-rmse = function()
-
 cross_validation_data_set = whoop_edit4
 
 splitPlan = kWayCrossValidation(nrow_whoop_df_regression_test, 3, NULL, NULL)
@@ -315,7 +313,7 @@ k = 3
 cross_validation_data_set$pred.cv = 0 
 for(i in 1:k) {
   split = splitPlan[[i]]
-  model = lm(strainReg2_formula, data = cross_validation_data_set[split$train, ])
+  model = lm(strain_model_formula, data = cross_validation_data_set[split$train, ])
   cross_validation_data_set$pred.cv[split$app] = predict(model, newdata = cross_validation_data_set[split$app, ])
 }
 
