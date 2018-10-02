@@ -94,6 +94,31 @@ whoop_edit4 %>%
 
 #load ggplot libary
 library(ggplot2)
+whoop_df_explore = whoop_edit4
+
+ggplot(whoop_df_explore, aes(x = "", y = strain)) + 
+  geom_boxplot()
+ggplot(whoop_df_explore, aes(x = strain)) + 
+  geom_histogram(aes(y = ..density..), binwidth = 1, color="black", fill="white") + 
+  geom_density(aes(x = strain), alpha=.2, fill="#FF6666") +
+  labs(title="Strain Histogram",x="Strain Score")
+
+ggplot(whoop_df_explore, aes(x = "", y = recovery)) + 
+  geom_boxplot()
+ggplot(whoop_df_explore, aes(x = recovery)) + 
+  geom_histogram(aes(y = ..density..), color="black", fill="white", binwidth = 0.05) +
+  geom_density(aes(x = recovery), alpha=.2, fill="#FF6666") +
+  labs(title="Recovery Histogram",x="Recovery Score")
+
+ggplot(whoop_df_explore, aes(x = "", y = sleepPerform)) + 
+  geom_boxplot()
+ggplot(whoop_df_explore, aes(x = sleepPerform)) + 
+  geom_histogram(aes(y =..density..), color="black", fill="white", binwidth = 0.05) +
+  geom_density(aes(x = sleepPerform), alpha=.2, fill="#FF6666") +
+  labs(title="Sleep Performance Histogram",x="Sleep Performance Score")
+
+
+
 ggplot(whoop_edit4, aes(x = date, y = hrv)) + geom_smooth() 
 ggplot(whoop_edit4, aes(x = timeREMSleep, y = sleepCycles, col = strain)) + geom_jitter() + stat_smooth(method = "loess")
 ggplot(whoop_edit4, aes(x = timeDeepSleep, y = hrv)) + geom_jitter()
@@ -188,6 +213,8 @@ whoop_df_regression_test$prediction = predict(strainReg2, whoop_df_regression_te
 
 library(ggplot2)
 
+whoop_df_strain_reg$
+
 ggplot(whoop_df_regression_test, aes(x = prediction, y = strain)) +
   geom_point() +
   geom_abline(color = "blue")
@@ -220,6 +247,19 @@ sd(whoop_df_regression_test$strain)
 (strain_toterr = whoop_df_regression_test$strain - mean(whoop_df_regression_test$strain))
 (strain_sstot = sum(strain_toterr^2))
 (strain_r_squared = 1 - (strain_rss/strain_sstot))
+
+library(caret)
+
+
+
+
+
+
+
+
+
+
+
 
 library(broom)
 (strain_r_squared_glance = glance(strainReg2)$r.squared)

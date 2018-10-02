@@ -132,6 +132,7 @@ summary(whoop_edit4)
 
 So now that we have our data set finally cleaned up and ready to go it's time for some initial exploratory analysis! To start we are going to load the ggplot2 package and do some visual analysis to take a deeper dive in the data. First, we'll begin by looking at the data for strain, recovery and sleep performance since these variables are the most important metrics given by WHOOP and ultimately shape how we approach balancing our training with recovery (and sleep!).
 
+EXPLORATORY DATA ANALYSIS
 ```{r}
 #load ggplot libary
 library(ggplot2)
@@ -143,21 +144,129 @@ whoop_df_explore = whoop_edit4
 ggplot(whoop_df_explore, aes(x = "", y = strain)) + 
   geom_boxplot()
 ggplot(whoop_df_explore, aes(x = strain)) + 
-  geom_histogram(binwidth = 1, color="black", fill="white")
+  geom_histogram(aes(y = ..density..), binwidth = 1, color="black", fill="white") + 
+  geom_density(aes(x = strain), alpha=.2, fill="#FF6666") +
+  labs(title="Strain Histogram",x="Strain Score")
 
 # boxplot and histogram of recovery data
 ggplot(whoop_df_explore, aes(x = "", y = recovery)) + 
   geom_boxplot()
 ggplot(whoop_df_explore, aes(x = recovery)) + 
-  geom_histogram(color="black", fill="white", binwidth = 0.05)
+  geom_histogram(aes(y = ..density..), color="black", fill="white", binwidth = 0.05) +
+  geom_density(aes(x = recovery), alpha=.2, fill="#FF6666") +
+  labs(title="Recovery Histogram",x="Recovery Score")
 
 # boxplot and histogram of sleep performance data
 ggplot(whoop_df_explore, aes(x = "", y = sleepPerform)) + 
   geom_boxplot()
 ggplot(whoop_df_explore, aes(x = sleepPerform)) + 
-  geom_histogram(color="black", fill="white", binwidth = 0.05)
+  geom_histogram(aes(y =..density..), color="black", fill="white", binwidth = 0.05) +
+  geom_density(aes(x = sleepPerform), alpha=.2, fill="#FF6666") +
+  labs(title="Sleep Performance Histogram",x="Sleep Performance Score")
+
 ```
 
+Ok so we have some cool visuals of the strain, recovery and sleep performance data, now what? Well...the whole point of this project was to determine the underlying biological markers (as mentioned above) that WHOOP also reports on to determine which indicators are crucial in determining these values. Strain is the first metric that we're going to focus on. The supplementary data related to strain that we can gather from WHOOP is max heart rate ("maxHR"), average heart rate ("averHR"), and calories ("cal") for that particular day. We'll begin by seeing what these variables relationships are in regards to strain using scatterplots.
 
+```{r}
+library(ggplot2)
+
+# scatter plot with max heart rate on x-axis and strain on y-axis
+ggplot(whoop_df_explore, aes(x = maxHR, y = strain)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with average heart rate on x-axis and strain on y-axis
+ggplot(whoop_df_explore, aes(x = averHR, y = strain)) +
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with calories on x-axis and strain on y-axis
+ggplot(whoop_df_explore, aes(x = cal, y = strain)) +
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE)
+
+# correlation between strain and the three variables
+cor(whoop_df_explore$strain, whoop_df_explore$maxHR)
+cor(whoop_df_explore$strain, whoop_df_explore$averHR)
+cor(whoop_df_explore$strain, whoop_df_explore$cal)
+```
+
+From these scatter plots, we can see that all three variables (max heart rate, average heart rate, and calories) appear to have a pretty strong positive correlation with strain. Then by using the cor() function to see the correlation we can confirm that all three variables have a pretty strong positive relationship of 0.8289397 (maxHR), 0.8253186 (averHR), and 0.9176248 (cal). 
+
+What these high correlation values tell me is that there is an obvious connection between strain and max heart rate, average heart rate and calories. From here, we can start to dive into linear regression to see if we can create a model that can accurately predict the daily strain score.
+
+```{r}
+# using lm function to create first 
+strain_model1 = lm(strain ~ maxHR + averHR + cal, data = whoop_df_explore)
+summary(strain_model1)
+
+strain_model2 = lm(strain ~ maxHR + cal, data = whoop_df_explore)
+summary(strain_model2)
+```
+I created two models, strain_model1 and strain_model2, that looks to predict the strain using 3 predictor variables (maxHR, averHR, cal) for the first model and 2 predictor variables (maxHR, cal) for the second model. The reasoning for the second model was to see what the affect on NOT including averHR would do to the model (since averHR's p-value was 0.0452, barely under the 0.05 threshold, and the fact that maxHR and cal showed an overwhelingly significant relationship). The second model proved to be almost as good as the first one, with it's R-squared being only 0.0031 below that of strain_model1. Despite this however, I have decided to go with strain_model1 for further analysis. 
+
+Max heart rate takes the highest heart rate that an individual achieved that day, so it is a good snapshot of what your maximal cardiovascular output was for that day (with a higher max heart rate more likely being achieved with high output activites like training) but it does not take into account heart rate flucuations throughout the day like average heart rate does. There are events that take place during the day (i.e. loading/unloading groceries, playing with kids, etc.) that while aren't maximal effort (which maxHR catches), nonetheless create significant cardiovascular strain on the body and thus average heart rate is better able to capture. This is why I decided to go with the model that includes average heart rate with max heart rate and not just the latter. 
+
+```{r}
+# function for first linear regression strainReg
+total_daily_strain = function(maxHR, averHR, cal) {
+  daily_strain = -13.951038 + maxHR*0.066266 + averHR*0.070551 + cal*0.003163
+  print(daily_strain)
+}
+
+# load sigr library so we can see statistical summaries more easily
+library(sigr)
+
+# F Test summary of strain_model1
+wrapFTest(strain_model1)
+
+# create data set specifically for strain regression model
+(whoop_df_strain_reg = whoop_df_explore)
+
+# create new column, strainPredict, that shows what the model would predict the strain score would be based off of maxHR, averHR and cal
+whoop_df_strain_reg$strainPredict = predict(strain_model1, whoop_df_strain_reg)
+head(whoop_df_strain_reg, n = 6)
+
+library(ggplot2)
+
+# scatter plot to show linear regression line (i.e. predicted strain score) against the actual strain scores
+ggplot(whoop_df_strain_reg, aes(x = strainPredict, y = strain)) +
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_abline(color = "red") + 
+  labs(title="Scatterplot of Predicted Strain Score vs. Actual Strain Score", x="Predicted Strain (based off model)", y = "Actual Strain Score")
+
+# create new data frame with single observation of maxHR, averHR, and cal to test strain model 
+new_strain = data.frame(maxHR = 170, averHR = 67, cal = 3400)
+new_strain$prediction = predict(strain_model1, newdata = new_strain)
+new_strain
+
+```
+
+Now that we got the predicted strain scores, we're going to create a column with the residuals between the model for strain and the actual observed strain values. 
+
+```{r}
+library(ggplot2)
+
+# create new column, strainResiduals, with the residuals b/w predicted strain score and actual strain value
+whoop_df_strain_reg$strainResiduals = whoop_df_strain_reg$strain - whoop_df_strain_reg$strainPredict
+
+# plot showcasing residuals of model vs. actual strain value
+ggplot(whoop_df_strain_reg, aes(x = strainPredict, y = strainResiduals)) +
+  geom_pointrange(aes(ymin = 0, ymax = strainResiduals), alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  labs(title="Plot of Residuals between Predicted Strain Score & Actual Strain Score", x="Strain", y = "Residuals")
+
+# RMSE 
+strain_model_error = whoop_df_strain_reg$strainPredict - whoop_df_strain_reg$strain
+strain_error_squared = strain_model_error^2
+(strain_model_rmse = sqrt(mean(strain_error_squared)))
+sd(whoop_df_strain_reg$strain)
+
+## Proportion of values contained between 2 RMSEs
+mean(abs(strain_model_error) < 2 * strain_model_rmse)
+```
+
+The root mean square error for regression says how far typical points are above or below the regression line. The RMSE is to the regression line as the SD is to the average. For instance, if the scatter diagram is football-shaped, about 68% of the points on the scatter diagram will be within one RMSE of the regression line, about 95% of then will be within 2 RMSE of the regression line.
 
 However, there are two rows that contain observations with the dates of August 9, 2018 and July 24, 2018. August 9th's only missing number is in the 'Sleep.Cycles' column. Since it is only one observation, I will correct this by filling it in with the mean number of sleep cycles. As for July 24th, it looks like it is missing most of it's information and due to this I think it best to eliminate this particular observation. 
