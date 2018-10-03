@@ -85,7 +85,7 @@ ggplot(whoop_df_explore, aes(x = "", y = strain)) +
 ggplot(whoop_df_explore, aes(x = strain)) + 
   geom_histogram(aes(y = ..density..), binwidth = 1, color="black", fill="white") + 
   geom_density(aes(x = strain), alpha=.2, fill="#FF6666") +
-  labs(title="Strain Histogram",x="Strain Score")
+  labs(title="Strain Histogram", x="Strain Score")
 
 # boxplot and histogram of recovery data
 ggplot(whoop_df_explore, aes(x = "", y = recovery)) + 
@@ -191,7 +191,7 @@ library(vtreat)
 cv_strain_model_df = whoop_df_strain_reg
 
 # function for 3-fold cross validation
-splitPlan = kWayCrossValidation(nrow_whoop_df_regression_test, 3, NULL, NULL)
+splitPlan = kWayCrossValidation(nrow(cv_strain_model_df), 5, NULL, NULL)
 str(splitPlan)
 
 # formula for strain linear regression model
