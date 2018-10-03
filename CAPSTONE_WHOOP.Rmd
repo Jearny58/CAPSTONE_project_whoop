@@ -277,8 +277,8 @@ library(vtreat)
 # create new data frame for cross validation, based off of previous data frame
 cv_strain_model_df = whoop_df_strain_reg
 
-# function for 3-fold cross validation
-splitPlan = kWayCrossValidation(nrow_whoop_df_regression_test, 3, NULL, NULL)
+# function for 5-fold cross validation
+splitPlan = kWayCrossValidation(nrow(cv_strain_model_df), 5, NULL, NULL)
 str(splitPlan)
 
 # formula for strain linear regression model
@@ -290,7 +290,7 @@ CONTINUATION OF CROSS VALIDATION
 
 ```{r}
 # number of folds
-k = 3
+k = 5
 
 cv_strain_model_df$strainPredict.cv = 0 
 
@@ -314,6 +314,5 @@ cvPredict_strain_error_squared = cvPredict_strain_model_error^2
 (cvPredict_strain_rmse = sqrt(mean(cvPredict_strain_error_squared)))
 ```
 
-
-
-However, there are two rows that contain observations with the dates of August 9, 2018 and July 24, 2018. August 9th's only missing number is in the 'Sleep.Cycles' column. Since it is only one observation, I will correct this by filling it in with the mean number of sleep cycles. As for July 24th, it looks like it is missing most of it's information and due to this I think it best to eliminate this particular observation. 
+ROOT-MEAN SQUARE ERROR (RMSE)
+--> The RMSE is the square root of the variance of the residuals. It indicates the absolute fit of the model to the data–how close the observed data points are to the model’s predicted values. Whereas R-squared is a relative measure of fit, RMSE is an absolute measure of fit. As the square root of a variance, RMSE can be interpreted as the standard deviation of the unexplained variance, and has the useful property of being in the same units as the response variable. Lower values of RMSE indicate better fit. RMSE is a good measure of how accurately the model predicts the response, and it is the most important criterion for fit if the main purpose of the model is prediction.

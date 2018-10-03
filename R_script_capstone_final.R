@@ -190,7 +190,7 @@ library(vtreat)
 # create new data frame for cross validation, based off of previous data frame
 cv_strain_model_df = whoop_df_strain_reg
 
-# function for 3-fold cross validation
+# function for 5-fold cross validation
 splitPlan = kWayCrossValidation(nrow(cv_strain_model_df), 5, NULL, NULL)
 str(splitPlan)
 
@@ -199,7 +199,7 @@ strain_model_formula = as.formula(strain ~ maxHR + averHR + cal)
 strain_model_formula
 
 # number of folds
-k = 3
+k = 5
 
 cv_strain_model_df$strainPredict.cv = 0 
 
