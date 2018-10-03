@@ -209,7 +209,7 @@ I created two models, strain_model1 and strain_model2, that looks to predict the
 Max heart rate takes the highest heart rate that an individual achieved that day, so it is a good snapshot of what your maximal cardiovascular output was for that day (with a higher max heart rate more likely being achieved with high output activites like training) but it does not take into account heart rate flucuations throughout the day like average heart rate does. There are events that take place during the day (i.e. loading/unloading groceries, playing with kids, etc.) that while aren't maximal effort (which maxHR catches), nonetheless create significant cardiovascular strain on the body and thus average heart rate is better able to capture. This is why I decided to go with the model that includes average heart rate with max heart rate and not just the latter. 
 
 ```{r}
-# function for first linear regression strainReg
+# function for linear regression model strain_model1
 total_daily_strain = function(maxHR, averHR, cal) {
   daily_strain = -13.951038 + maxHR*0.066266 + averHR*0.070551 + cal*0.003163
   print(daily_strain)
@@ -362,6 +362,87 @@ ggplot(whoop_df_explore, aes(x = sleepCycles, y = sleepPerform)) +
   geom_smooth(method = "lm", se = FALSE)
 
 ```
+
+MODEL FOR SLEEP PERFORMANCE
+```{r}
+# linear regression to predict sleepPerform using stages of sleep (primarily)
+sleepPerform_model1 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_df_explore)
+summary(sleepPerform_model1)
+
+sleepPerform_model2 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep, data = whoop_df_explore)
+summary(sleepPerform_model2)
+
+# linear regress to predict sleepPerform using total time spent in bed and sleeping
+sleepPerform_model3 = lm(sleepPerform ~ timeInBed + totalSleep + sleepCycles, data = whoop_df_explore)
+summary(sleepPerform_model3)
+
+sleepPerform_model4 = lm(sleepPerform ~ timeInBed + totalSleep, data = whoop_df_explore)
+summary(sleepPerform_model4)
+
+```
+
+MODEL FOR SLEEP PERFORMANCE (cont.)
+```{r}
+# function based off of coefficients in sleepPerform_model4
+sleepPerformFunc = function(timeInBed, totalSleep) {
+  sleep_perform = 0.10689 + timeInBed*0.03181 + 0.06182*totalSleep
+  print(sleep_perform)
+}
+
+# load sigr library so we can see statistical summaries more easily
+library(sigr)
+
+# F Test summary of sleepPerform_model4
+wrapFTest(sleepPerform_model4)
+
+# create data set specifically for sleep performance regression model
+(whoop_df_sleepPerform_reg = whoop_df_explore)
+
+# create new column, sleepPredict, that shows what the model would predict the sleep performance score would be based off of time in bed and total sleep
+whoop_df_sleepPerform_reg$sleepPredict = predict(sleepPerform_model4, whoop_df_sleepPerform_reg)
+head(whoop_df_sleepPerform_reg, n = 6)
+
+library(ggplot2)
+
+# scatter plot to show linear regression line (i.e. predicted sleep performance score) against the actual sleep performance scores
+ggplot(whoop_df_sleepPerform_reg, aes(x = sleepPredict, y = sleepPerform)) +
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_abline(color = "red") + 
+  labs(title="Scatterplot of Predicted Sleep Perf. Score vs. Actual Sleep Perf. Score", x="Predicted Sleep Perf. (based off model)", y = "Actual Sleep Perf. Score")
+
+# create new data frame with single observation of timeInBed and totalSleep to test sleep model 
+new_sleep = data.frame(timeInBed = 6.28, totalSleep = 5.78)
+new_sleep$prediction = predict(sleepPerform_model4, newdata = new_sleep)
+new_sleep
+
+
+```
+
+MODEL FOR SLEEP PERFORMANCE (CONT.)
+```{r}
+library(ggplot2)
+
+# create new column, sleepResiduals, with the residuals b/w predicted sleep score and actual sleep value
+whoop_df_sleepPerform_reg$sleepResiduals = whoop_df_sleepPerform_reg$sleepPerform - whoop_df_sleepPerform_reg$sleepPredict
+
+# plot showcasing residuals of model vs. actual sleep value
+ggplot(whoop_df_sleepPerform_reg, aes(x = sleepPredict, y = sleepResiduals)) +
+  geom_pointrange(aes(ymin = 0, ymax = sleepResiduals), alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  labs(title="Plot of Residuals between Predicted Sleep Score & Actual Sleep Score", x="Sleep", y = "Residuals")
+
+# RMSE 
+sleep_model_error = whoop_df_sleepPerform_reg$sleepPredict - whoop_df_strain_reg$sleepPerform
+sleep_error_squared = sleep_model_error^2
+(sleep_model_rmse = sqrt(mean(sleep_error_squared)))
+sd(whoop_df_sleepPerform_reg$sleepPerform)
+
+## Proportion of values contained between 2 RMSEs
+mean(abs(sleep_model_error) < 2 * sleep_model_rmse)
+```
+
+
+
 
 
 EXPLORATORY ANALYSIS FOR RECOVERY

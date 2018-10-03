@@ -369,8 +369,8 @@ recoveryPredict_R2 = 1 - recoveryPredict_SSE/recoveryPredict_SST
 recoveryPredict_R2
 
 # linear regression to predict sleepPerform using stages of sleep (primarily)
-sleepPerfomReg = lm(sleepPerform ~ timeInBed + timeLightSleep + timeREMSleep + timeDeepSleep + totalSleep + sleepCycles, data = whoop_edit4)
-summary(sleepPerfomReg)
+sleepPerfom_model1 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_df_explore)
+summary(sleepPerform_model1)
 
 sleepPerfomReg2 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_edit4)
 summary(sleepPerfomReg2)
