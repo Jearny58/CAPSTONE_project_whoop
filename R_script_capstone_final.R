@@ -221,3 +221,6 @@ cv_strain_error_squared = cv_strain_model_error^2
 cvPredict_strain_model_error = cv_strain_model_df$strainPredict.cv - cv_strain_model_df$strain
 cvPredict_strain_error_squared = cvPredict_strain_model_error^2
 (cvPredict_strain_rmse = sqrt(mean(cvPredict_strain_error_squared)))
+
+AIC(strain_model1)
+AIC(strain_model2)

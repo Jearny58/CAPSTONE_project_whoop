@@ -316,3 +316,154 @@ cvPredict_strain_error_squared = cvPredict_strain_model_error^2
 
 ROOT-MEAN SQUARE ERROR (RMSE)
 --> The RMSE is the square root of the variance of the residuals. It indicates the absolute fit of the model to the data–how close the observed data points are to the model’s predicted values. Whereas R-squared is a relative measure of fit, RMSE is an absolute measure of fit. As the square root of a variance, RMSE can be interpreted as the standard deviation of the unexplained variance, and has the useful property of being in the same units as the response variable. Lower values of RMSE indicate better fit. RMSE is a good measure of how accurately the model predicts the response, and it is the most important criterion for fit if the main purpose of the model is prediction.
+
+EXPLORATORY ANALYSIS FOR SLEEP PERFORMANCE
+```{r}
+# use whoop_df_explore for exploratory analysis of sleep performance
+library(ggplot2)
+
+# returns sleepPerform column
+sleep_y = whoop_df_explore[4]
+
+# returns columns 8 through 15
+sleep_x = whoop_df_explore[8:15]
+
+# cor() function to see any interesting variables to check out visually with regards to sleep performance
+cor(sleep_x, sleep_y)
+
+# scatter plot with timeInBed as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeInBed, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with timeLightSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeLightSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with timeREMSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeREMSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+#scatter plot with timeDeepSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeDeepSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+#scatter plot with totalSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = totalSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with sleepCycles as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = sleepCycles, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+```
+
+
+EXPLORATORY ANALYSIS FOR RECOVERY
+```{r}
+# use whoop_df_explore for exploratory analysis of sleep performance
+library(ggplot2)
+library(dplyr)
+
+# create data frames to test correlation between recovery score and other variables
+(recovery_x = whoop_df_explore[3])
+(recovery_y = whoop_df_explore[4:15])
+
+# shows correlations between recovery and other variables
+cor(recovery_y, recovery_x)
+
+# scatter plot with hrv as x and recovery as y
+ggplot(whoop_df_explore, aes(x = hrv, y = recovery)) + 
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with sleepPerform as x and recovery as y
+ggplot(whoop_df_explore, aes(x = sleepPerform, y = recovery)) + 
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_smooth(method = "lm", se = FALSE)
+
+```
+
+MODEL FOR RECOVERY
+```{r}
+# load sigr library so we can see statistical summaries more easily
+library(sigr)
+library(ggplot2)
+
+# create data set specifically for recovery regression model
+(whoop_df_recovery_reg = whoop_df_explore)
+
+# linear regression to predict recovery w/ hrv and sleepPerform as independent variable
+recovery_model1 = lm(recovery ~ hrv + sleepPerform, data = whoop_df_explore)
+summary(recovery_model1)
+
+recovery_model2 = lm(recovery ~ hrv + timeInBed + totalSleep, data = whoop_df_explore)
+summary(recovery_model2)
+
+# F Test summary of recovery_model1
+wrapFTest(recovery_model1)
+
+# create new column, recoveryPredict, that shows what the model would predict the recovery score would be based off of hrv and sleep performance
+whoop_df_recovery_reg$recoveryPredict = predict(recovery_model1, whoop_df_recovery_reg)
+head(whoop_df_recovery_reg, n = 6)
+
+# scatter plot to show linear regression line (i.e. predicted recovery score) against the actual recovery scores
+ggplot(whoop_df_recovery_reg, aes(x = recoveryPredict, y = recovery)) +
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_abline(color = "red") + 
+  labs(title="Scatterplot of Predicted Recovery Score vs. Actual Recovery Score", x="Predicted Recovery (based off model)", y = "Actual Recovery Score")
+
+# create new data frame with single observation of hrv and sleepPerform to test recovery model 
+new_recovery = data.frame(hrv = 71, sleepPerform = 0.63) # scores are from 8-14-2018 observation, w/ a recovery score of 0.58
+new_recovery$prediction = predict(recovery_model1, newdata = new_recovery)
+new_recovery
+
+```
+
+MODEL FOR RECOVERY (cont.)
+```{r}
+library(ggplot2)
+
+# create new column, recoveryResiduals, with the residuals b/w predicted recovery score and actual recovery value
+whoop_df_recovery_reg$recoveryResiduals = whoop_df_recovery_reg$recovery - whoop_df_recovery_reg$recoveryPredict
+
+# plot showcasing residuals of model vs. actual recovery value
+ggplot(whoop_df_recovery_reg, aes(x = recoveryPredict, y = recoveryResiduals)) +
+  geom_pointrange(aes(ymin = 0, ymax = recoveryResiduals), alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  labs(title="Plot of Residuals between Predicted Recovery Score & Actual Recovery Score", x="Recovery", y = "Residuals")
+
+# RMSE 
+recovery_model_error = whoop_df_recovery_reg$recoveryPredict - whoop_df_recovery_reg$recovery
+recovery_error_squared = recovery_model_error^2
+(recovery_model_rmse = sqrt(mean(recovery_error_squared)))
+sd(whoop_df_strain_reg$strain)
+
+## Proportion of values contained between 2 RMSEs
+mean(abs(recovery_model_error) < 2 * recovery_model_rmse)
+```
+
+
+
+
+
+
+
+EXPLORATORY ANALYSIS FOR HRV
+```{r}
+# use whoop_df_explore for exploratory analysis of sleep performance
+library(ggplot2)
+library(dplyr)
+
+hrv_1 = whoop_df_explore[8]
+hrv_2 = whoop_df_explore %>%
+  select(-date)
+
+cor(hrv_1, hrv_2)
+```
+
