@@ -299,6 +299,20 @@ cv_strain_error_squared = cv_strain_model_error^2
 
 ```
 
+CARET PACKAGE k-fold CROSS-VALIDATION
+```{r}
+library(caret)
+
+# define training control
+train_control_strain = trainControl(method = "repeatedcv", number = 10, repeats = 3)
+
+# train the model
+model_strain = train(strain ~ maxHR + averHR + cal, data = whoop_df_strain_reg, trControl = train_control_strain, method = "nb")
+
+# summarize results
+print(model_strain)
+```
+
 CONTINUATION OF CROSS VALIDATION (DO NOT USE THIS PARTICULAR CHUNK OF CODE, SEE ABOVE)
 
 ```{r}
