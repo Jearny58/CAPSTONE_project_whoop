@@ -198,7 +198,7 @@ What these high correlation values tell me is that there is an obvious connectio
 
 ```{r}
 # using lm function to create first 
-strain_model1 = lm(strain ~ maxHR + averHR + cal, data = whoop_df_explore)
+strain_model1 = glm(strain ~ maxHR + averHR + cal, data = whoop_df_explore)
 summary(strain_model1)
 
 strain_model2 = lm(strain ~ maxHR + cal, data = whoop_df_explore)
@@ -219,7 +219,7 @@ total_daily_strain = function(maxHR, averHR, cal) {
 library(sigr)
 
 # F Test summary of strain_model1
-wrapFTest(strain_model1)
+# wrapFTest(strain_model1)
 
 # create data set specifically for strain regression model
 (whoop_df_strain_reg = whoop_df_explore)
@@ -271,6 +271,18 @@ The root mean square error for regression says how far typical points are above 
 
 CROSS VALIDATION OF STRAIN MODEL
 ```{r}
+library(boot)
+
+# K-fold CV
+strain_mse_10foldcv = NULL
+
+for(i in 1:10) {
+  model = glm(strain_model_formula, data = whoop_df_strain_reg)
+  strain_mse_10foldcv[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
+}
+
+strain_mse_10foldcv
+
 # Create a cross-validation plan
 library(vtreat)
 
