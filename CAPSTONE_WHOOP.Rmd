@@ -317,6 +317,32 @@ cvPredict_strain_error_squared = cvPredict_strain_model_error^2
 ROOT-MEAN SQUARE ERROR (RMSE)
 --> The RMSE is the square root of the variance of the residuals. It indicates the absolute fit of the model to the data–how close the observed data points are to the model’s predicted values. Whereas R-squared is a relative measure of fit, RMSE is an absolute measure of fit. As the square root of a variance, RMSE can be interpreted as the standard deviation of the unexplained variance, and has the useful property of being in the same units as the response variable. Lower values of RMSE indicate better fit. RMSE is a good measure of how accurately the model predicts the response, and it is the most important criterion for fit if the main purpose of the model is prediction.
 
+TRAINING/TEST SETS FOR STRAIN MODEL
+```{r}
+library(caret)
+
+# 75% of the sample size
+smp_size = floor(0.75 * nrow(whoop_df_strain_reg))
+
+# set the see to make parition reproducible
+set.seed(76)
+train_ind = sample(seq_len(nrow(whoop_df_strain_reg)), size = smp_size)
+
+train_strain = whoop_df_strain_reg[train_ind, ]
+test_strain = whoop_df_strain_reg[-train_ind, ]
+
+# strain prediction for strain model
+strainPrediction = predict(strain_model1, newdata = test_strain)
+strainPrediction
+
+# sum squared errors & total sums of squares
+predict_SSE = sum((strainPrediction - test_strain$strain)^2)
+predict_SST = sum((mean(whoop_df_strain_reg$strain) - test_strain$strain)^2)
+predict_R2 = 1 - predict_SSE/predict_SST
+predict_R2
+```
+
+
 EXPLORATORY ANALYSIS FOR SLEEP PERFORMANCE
 ```{r}
 # use whoop_df_explore for exploratory analysis of sleep performance
