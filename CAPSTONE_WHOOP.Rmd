@@ -298,7 +298,7 @@ cv_strain_error_squared = cv_strain_model_error^2
 
 ```
 
-CONTINUATION OF CROSS VALIDATION 
+CONTINUATION OF CROSS VALIDATION (DO NOT USE THIS PARTICULAR CHUNK OF CODE, SEE ABOVE)
 
 ```{r}
 # number of folds
