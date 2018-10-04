@@ -1,0 +1,16 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+WEDNESDAY OCTOBER 3, 2018 CALL
+--> tighten the narrative
+--> keep project motivation in mind
+--> in final version, utilize read-me information on variables in R markdown
+--> AIC number meaning --> higher penalty for more penalties --> R^2 similar concept --> not useful when comparing across types of models (models i.e. may be different, like comparing apples and oranges)
+--> R^2 has a statistical basis 
+
+--> caret can create 5-fold cross validation, run the models and take RMSE
+--> takes average of all models and gives a master model
+--> adapt to audience you want to present to
+--> knitting, essentially creates an html report that you can export
