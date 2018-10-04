@@ -273,6 +273,10 @@ CROSS VALIDATION OF STRAIN MODEL
 ```{r}
 library(boot)
 
+# formula for strain linear regression model
+strain_model_formula = as.formula(strain ~ maxHR + averHR + cal)
+strain_model_formula
+
 # K-fold CV
 strain_mse_10foldcv = NULL
 
@@ -281,21 +285,17 @@ for(i in 1:10) {
   strain_mse_10foldcv[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
 }
 
-strain_mse_10foldcv
+# mean of RMSE of 10-fold cross-validation
+mean(sqrt(strain_mse_10foldcv))
 
-# Create a cross-validation plan
-library(vtreat)
+# predict from a full model
+cv_strain_model_df$strainPredict.cv = predict(strain_model1, data = cv_strain_model_df)
 
-# create new data frame for cross validation, based off of previous data frame
-cv_strain_model_df = whoop_df_strain_reg
+# RMSE for full model's predictions
+cv_strain_model_error = cv_strain_model_df$strainPredict - cv_strain_model_df$strain
+cv_strain_error_squared = cv_strain_model_error^2
+(cv_strain_model_rmse = sqrt(mean(cv_strain_error_squared)))
 
-# function for 5-fold cross validation
-splitPlan = kWayCrossValidation(nrow(cv_strain_model_df), 5, NULL, NULL)
-str(splitPlan)
-
-# formula for strain linear regression model
-strain_model_formula = as.formula(strain ~ maxHR + averHR + cal)
-strain_model_formula
 ```
 
 CONTINUATION OF CROSS VALIDATION 
