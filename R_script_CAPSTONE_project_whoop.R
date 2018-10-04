@@ -1,6 +1,8 @@
 # load gdata package
 library(gdata)
 
+install.package("klaR")
+
 # load dplyr
 library(dplyr)
 
