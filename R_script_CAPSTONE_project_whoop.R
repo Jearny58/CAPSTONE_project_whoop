@@ -355,6 +355,8 @@ predict_SST = sum((mean(whoop_edit4$strain) - test_set$strain)^2)
 predict_R2 = 1 - predict_SSE/predict_SST
 predict_R2
 
+
+
 # linear regression to predict recovery w/ hrv as independent variable
 recoveryReg = lm(recovery ~ hrv + sleepPerform, data = whoop_edit4)
 summary(recoveryReg)
