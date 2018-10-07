@@ -197,11 +197,11 @@ From these scatter plots, we can see that all three variables (max heart rate, a
 What these high correlation values tell me is that there is an obvious connection between strain and max heart rate, average heart rate and calories. From here, we can start to dive into linear regression to see if we can create a model that can accurately predict the daily strain score.
 
 ```{r}
-# using lm function to create first 
+# using glm function to create first model
 strain_model1 = glm(strain ~ maxHR + averHR + cal, data = whoop_df_explore)
 summary(strain_model1)
 
-strain_model2 = lm(strain ~ maxHR + cal, data = whoop_df_explore)
+strain_model2 = glm(strain ~ maxHR + cal, data = whoop_df_explore)
 summary(strain_model2)
 ```
 I created two models, strain_model1 and strain_model2, that looks to predict the strain using 3 predictor variables (maxHR, averHR, cal) for the first model and 2 predictor variables (maxHR, cal) for the second model. The reasoning for the second model was to see what the affect on NOT including averHR would do to the model (since averHR's p-value was 0.0452, barely under the 0.05 threshold, and the fact that maxHR and cal showed an overwhelingly significant relationship). The second model proved to be almost as good as the first one, with it's R-squared being only 0.0031 below that of strain_model1. Despite this however, I have decided to go with strain_model1 for further analysis. 
@@ -352,17 +352,17 @@ ggplot(whoop_df_explore, aes(x = sleepCycles, y = sleepPerform)) +
 MODEL FOR SLEEP PERFORMANCE
 ```{r}
 # linear regression to predict sleepPerform using stages of sleep (primarily)
-sleepPerform_model1 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_df_explore)
+sleepPerform_model1 = glm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_df_explore)
 summary(sleepPerform_model1)
 
-sleepPerform_model2 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep, data = whoop_df_explore)
+sleepPerform_model2 = glm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep, data = whoop_df_explore)
 summary(sleepPerform_model2)
 
 # linear regress to predict sleepPerform using total time spent in bed and sleeping
-sleepPerform_model3 = lm(sleepPerform ~ timeInBed + totalSleep + sleepCycles, data = whoop_df_explore)
+sleepPerform_model3 = glm(sleepPerform ~ timeInBed + totalSleep + sleepCycles, data = whoop_df_explore)
 summary(sleepPerform_model3)
 
-sleepPerform_model4 = lm(sleepPerform ~ timeInBed + totalSleep, data = whoop_df_explore)
+sleepPerform_model4 = glm(sleepPerform ~ timeInBed + totalSleep, data = whoop_df_explore)
 summary(sleepPerform_model4)
 
 ```
@@ -377,9 +377,6 @@ sleepPerformFunc = function(timeInBed, totalSleep) {
 
 # load sigr library so we can see statistical summaries more easily
 library(sigr)
-
-# F Test summary of sleepPerform_model4
-wrapFTest(sleepPerform_model4)
 
 # create data set specifically for sleep performance regression model
 (whoop_df_sleepPerform_reg = whoop_df_explore)
@@ -494,14 +491,11 @@ library(ggplot2)
 (whoop_df_recovery_reg = whoop_df_explore)
 
 # linear regression to predict recovery w/ hrv and sleepPerform as independent variable
-recovery_model1 = lm(recovery ~ hrv + sleepPerform, data = whoop_df_explore)
+recovery_model1 = glm(recovery ~ hrv + sleepPerform, data = whoop_df_explore)
 summary(recovery_model1)
 
-recovery_model2 = lm(recovery ~ hrv + timeInBed + totalSleep, data = whoop_df_explore)
+recovery_model2 = glm(recovery ~ hrv + timeInBed + totalSleep, data = whoop_df_explore)
 summary(recovery_model2)
-
-# F Test summary of recovery_model1
-wrapFTest(recovery_model1)
 
 # create new column, recoveryPredict, that shows what the model would predict the recovery score would be based off of hrv and sleep performance
 whoop_df_recovery_reg$recoveryPredict = predict(recovery_model1, whoop_df_recovery_reg)
@@ -543,22 +537,33 @@ sd(whoop_df_strain_reg$strain)
 mean(abs(recovery_model_error) < 2 * recovery_model_rmse)
 ```
 
-
-
-
-
-
-
-EXPLORATORY ANALYSIS FOR HRV
+K-FOLD CROSS VALIDATION FOR RECOVERY MODEL
 ```{r}
-# use whoop_df_explore for exploratory analysis of sleep performance
-library(ggplot2)
-library(dplyr)
+library(boot)
 
-hrv_1 = whoop_df_explore[8]
-hrv_2 = whoop_df_explore %>%
-  select(-date)
+# formula for recovery linear regression model
+recovery_model_formula = as.formula(recovery ~ hrv + sleepPerform)
+recovery_model_formula
 
-cor(hrv_1, hrv_2)
+# K-fold CV
+recovery_mse_10foldcv = NULL
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+# mean of RMSE of 10-fold cross-validation
+sqrt(recovery_mse_10foldcv)
+mean(sqrt(recovery_mse_10foldcv))
+
+# predict from a full model
+whoop_df_recovery_reg$recoveryPredict.cv = predict(recovery_model1, data = whoop_df_recovery_reg)
+
+# RMSE for full model's predictions
+cv_recovery_model_error = whoop_df_recovery_reg$recoveryPredict.cv - whoop_df_recovery_reg$recovery
+cv_recovery_error_squared = cv_recovery_model_error^2
+(cv_recovery_model_rmse = sqrt(mean(cv_recovery_error_squared)))
 ```
+
 
