@@ -282,7 +282,7 @@ strain_mse_10foldcv = NULL
 
 for(i in 1:10) {
   model = glm(strain_model_formula, data = whoop_df_strain_reg)
-  strain_mse_10foldcv[i] = cv.glm(whoop_df_strain_reg, model, K = 5)$delta[1]
+  strain_mse_10foldcv[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
 }
 
 # mean of RMSE of 10-fold cross-validation
@@ -290,84 +290,17 @@ sqrt(strain_mse_10foldcv)
 mean(sqrt(strain_mse_10foldcv))
 
 # predict from a full model
-cv_strain_model_df$strainPredict.cv = predict(strain_model1, data = cv_strain_model_df)
+whoop_df_strain_reg$strainPredict.cv = predict(strain_model1, data = whoop_df_strain_reg)
 
 # RMSE for full model's predictions
-cv_strain_model_error = cv_strain_model_df$strainPredict - cv_strain_model_df$strain
+cv_strain_model_error = whoop_df_strain_reg$strainPredict.cv - whoop_df_strain_reg$strain
 cv_strain_error_squared = cv_strain_model_error^2
 (cv_strain_model_rmse = sqrt(mean(cv_strain_error_squared)))
 
-```
-
-CARET PACKAGE k-fold CROSS-VALIDATION
-```{r}
-library(caret)
-
-# define training control
-train_control_strain = trainControl(method = "repeatedcv", number = 10, repeats = 3)
-
-# train the model
-model_strain = train(strain ~ maxHR + averHR + cal, data = whoop_df_strain_reg, trControl = train_control_strain, method = "nb")
-
-# summarize results
-print(model_strain)
-```
-
-CONTINUATION OF CROSS VALIDATION (DO NOT USE THIS PARTICULAR CHUNK OF CODE, SEE ABOVE)
-
-```{r}
-# number of folds
-k = 5
-
-cv_strain_model_df$strainPredict.cv = 0 
-
-for(i in 1:k) {
-  split = splitPlan[[i]]
-  model = lm(strain_model_formula, data = cv_strain_model_df[split$train, ])
-  cv_strain_model_df$strainPredict.cv[split$app] = predict(model, newdata = cv_strain_model_df[split$app, ])
-}
-
-# predict from a full model
-cv_strain_model_df$strainPredict.cv = predict(strain_model1, data = cv_strain_model_df)
-
-# RMSE for full model's predictions
-cv_strain_model_error = cv_strain_model_df$strainPredict - cv_strain_model_df$strain
-cv_strain_error_squared = cv_strain_model_error^2
-(cv_strain_model_rmse = sqrt(mean(cv_strain_error_squared)))
-
-# RMSE for cross-validation predictions
-cvPredict_strain_model_error = cv_strain_model_df$strainPredict.cv - cv_strain_model_df$strain
-cvPredict_strain_error_squared = cvPredict_strain_model_error^2
-(cvPredict_strain_rmse = sqrt(mean(cvPredict_strain_error_squared)))
 ```
 
 ROOT-MEAN SQUARE ERROR (RMSE)
 --> The RMSE is the square root of the variance of the residuals. It indicates the absolute fit of the model to the data–how close the observed data points are to the model’s predicted values. Whereas R-squared is a relative measure of fit, RMSE is an absolute measure of fit. As the square root of a variance, RMSE can be interpreted as the standard deviation of the unexplained variance, and has the useful property of being in the same units as the response variable. Lower values of RMSE indicate better fit. RMSE is a good measure of how accurately the model predicts the response, and it is the most important criterion for fit if the main purpose of the model is prediction.
-
-TRAINING/TEST SETS FOR STRAIN MODEL
-```{r}
-library(caret)
-
-# 75% of the sample size
-smp_size = floor(0.75 * nrow(whoop_df_strain_reg))
-
-# set the see to make parition reproducible
-set.seed(76)
-train_ind = sample(seq_len(nrow(whoop_df_strain_reg)), size = smp_size)
-
-train_strain = whoop_df_strain_reg[train_ind, ]
-test_strain = whoop_df_strain_reg[-train_ind, ]
-
-# strain prediction for strain model
-strainPrediction = predict(strain_model1, newdata = test_strain)
-strainPrediction
-
-# sum squared errors & total sums of squares
-predict_SSE = sum((strainPrediction - test_strain$strain)^2)
-predict_SST = sum((mean(whoop_df_strain_reg$strain) - test_strain$strain)^2)
-predict_R2 = 1 - predict_SSE/predict_SST
-predict_R2
-```
 
 
 EXPLORATORY ANALYSIS FOR SLEEP PERFORMANCE
@@ -494,6 +427,34 @@ sd(whoop_df_sleepPerform_reg$sleepPerform)
 mean(abs(sleep_model_error) < 2 * sleep_model_rmse)
 ```
 
+K-FOLD CROSS VALIDATION FOR SLEEP PERFORMANCE MODEL
+```{r}
+library(boot)
+
+# formula for sleep performance linear regression model
+sleep_model_formula = as.formula(sleepPerform ~ timeInBed + totalSleep)
+sleep_model_formula
+
+# K-fold CV
+sleep_mse_10foldcv = NULL
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+# mean of RMSE of 10-fold cross-validation
+sqrt(sleep_mse_10foldcv)
+mean(sqrt(sleep_mse_10foldcv))
+
+# predict from a full model
+whoop_df_sleepPerform_reg$sleepPredict.cv = predict(sleepPerform_model4, data = whoop_df_sleepPerform_reg)
+
+# RMSE for full model's predictions
+cv_sleep_model_error = whoop_df_sleepPerform_reg$sleepPredict.cv - whoop_df_sleepPerform_reg$sleepPerform
+cv_sleep_error_squared = cv_sleep_model_error^2
+(cv_sleep_model_rmse = sqrt(mean(cv_sleep_error_squared)))
+```
 
 
 
