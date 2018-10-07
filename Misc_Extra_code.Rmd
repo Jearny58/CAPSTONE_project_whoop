@@ -1,0 +1,89 @@
+---
+title: "Misc. Code For Capstone"
+author: "Joe Earnshaw"
+date: "10/7/2018"
+output: html_document
+---
+
+CARET PACKAGE k-fold CROSS-VALIDATION
+```{r}
+library(caret)
+
+# define training control
+train_control_strain = trainControl(method = "repeatedcv", number = 10, repeats = 3)
+
+# train the model
+model_strain = train(strain ~ maxHR + averHR + cal, data = whoop_df_strain_reg, trControl = train_control_strain, method = "nb")
+
+# summarize results
+print(model_strain)
+```
+
+CONTINUATION OF CROSS VALIDATION (DO NOT USE THIS PARTICULAR CHUNK OF CODE, SEE ABOVE)
+
+```{r}
+# number of folds
+k = 5
+
+cv_strain_model_df$strainPredict.cv = 0 
+
+for(i in 1:k) {
+  split = splitPlan[[i]]
+  model = lm(strain_model_formula, data = cv_strain_model_df[split$train, ])
+  cv_strain_model_df$strainPredict.cv[split$app] = predict(model, newdata = cv_strain_model_df[split$app, ])
+}
+
+# predict from a full model
+cv_strain_model_df$strainPredict.cv = predict(strain_model1, data = cv_strain_model_df)
+
+# RMSE for full model's predictions
+cv_strain_model_error = cv_strain_model_df$strainPredict - cv_strain_model_df$strain
+cv_strain_error_squared = cv_strain_model_error^2
+(cv_strain_model_rmse = sqrt(mean(cv_strain_error_squared)))
+
+# RMSE for cross-validation predictions
+cvPredict_strain_model_error = cv_strain_model_df$strainPredict.cv - cv_strain_model_df$strain
+cvPredict_strain_error_squared = cvPredict_strain_model_error^2
+(cvPredict_strain_rmse = sqrt(mean(cvPredict_strain_error_squared)))
+```
+
+TRAINING/TEST SETS FOR STRAIN MODEL
+```{r}
+library(caret)
+
+# 75% of the sample size
+smp_size = floor(0.75 * nrow(whoop_df_strain_reg))
+
+# set the see to make parition reproducible
+set.seed(76)
+train_ind = sample(seq_len(nrow(whoop_df_strain_reg)), size = smp_size)
+
+train_strain = whoop_df_strain_reg[train_ind, ]
+test_strain = whoop_df_strain_reg[-train_ind, ]
+
+# strain prediction for strain model
+strainPrediction = predict(strain_model1, newdata = test_strain)
+strainPrediction
+
+# sum squared errors & total sums of squares
+predict_SSE = sum((strainPrediction - test_strain$strain)^2)
+predict_SST = sum((mean(whoop_df_strain_reg$strain) - test_strain$strain)^2)
+predict_R2 = 1 - predict_SSE/predict_SST
+predict_R2
+```
+
+
+
+EXPLORATORY ANALYSIS FOR HRV
+```{r}
+# use whoop_df_explore for exploratory analysis of sleep performance
+library(ggplot2)
+library(dplyr)
+
+hrv_1 = whoop_df_explore[8]
+hrv_2 = whoop_df_explore %>%
+  select(-date)
+
+cor(hrv_1, hrv_2)
+```
+
