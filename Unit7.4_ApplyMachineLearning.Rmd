@@ -1,0 +1,37 @@
+---
+title: "Unit7.4_ApplyMachineLearning"
+author: "Joe Earnshaw"
+date: "10/8/2018"
+output: html_document
+---
+
+Project: Apply machine learning to your capstone project
+
+You've collected your data, cleaned it up, wrangled it into shape and explored it. Now it's time to perform some in-depth data analysis using machine learning. This step depends on you and your mentor, but here are some suggestions to get you going.
+
+1. How do you frame your main question as a machine learning problem? Is it a supervised or unsupervised problem? If it is supervised, is it a regression or a classification?
+
+--> I began by looking at the three primary metrics that WHOOP utilizes to relay health information to its users: strain, recovery, and sleep performance. Below is a high level overview of the the three metrics and what they are tracking: 
+  --> Strain: total cardiovascular load accumulated over a day
+  --> Recovery: how ready your body is to take on cardiovascular load on that       particular day
+  --> Sleep Performance: how close you got to achieving the level of sleep your     body had required based off of the strain it experienced over that previous day
+
+Looking at it from a machine learning problem, I thought, "how might one be able to predict these scores?". Essentially, what I want to be able to do is attempt to 'simulate' a score for any one of the three metrics involved based on certain independent variables that the user could exert as much influence over as possible. I feel that the best means to achieve this are through supervised learning, more specifically through the use of regression models. 
+
+2. What are the main features (also called independent variables or predictors) that you'll use?
+
+--> For the strain metric, I will be using three variables: max heart rate, average (daily) heart rate and calories burned. 
+--> For the sleep performance metric, I will be using two variables: total time in bed and total time asleep. 
+--> For the recovery metric, I will be using two variables: hrv and sleep performance. 
+
+3. Which machine learning technique will you use?
+
+--> I will be using regression models to predict the values for the three metrics: strain, sleep performance and recovery. 
+
+For strain the inputs will be max heart rate, average (daily) heart rate and calories burned; for sleep performance, the inputs will be total time in bed and total time asleep; and for recovery, the inputs will be hrv and sleep performance.
+
+4. How will you evaluate the success of your machine learning technique? What metric will you use?
+
+--> I will utilize K-fold cross validation to evaluate the models I generated for the three metrics. The reason for this is because one, it is simple to understand and two, because it generally results in less biased/optimistic estimate of the model compared to using simple train/test splits(1). I choose the value for k to be 10 because it is "a value that has been found through experimentation to generally result in a model skill estimate with low bias and modest variance"(1). 
+
+I will gather the RMSE from each fold from the cross validation procedure then compare it to the full model's RMSE to assess its overall performance. 
