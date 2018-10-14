@@ -174,7 +174,8 @@ library(ggplot2)
 # scatter plot with max heart rate on x-axis and strain on y-axis
 ggplot(whoop_df_explore, aes(x = maxHR, y = strain)) + 
   geom_point() +
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title="Scatterplot of Max Heart Rate and Strain Score", x="Max Heart Rate", y = "")
 
 # scatter plot with average heart rate on x-axis and strain on y-axis
 ggplot(whoop_df_explore, aes(x = averHR, y = strain)) +
@@ -298,6 +299,26 @@ cv_strain_error_squared = cv_strain_model_error^2
 (cv_strain_model_rmse = sqrt(mean(cv_strain_error_squared)))
 
 ```
+
+```{r}
+library(caret)
+
+# Creates control file
+ctrl <- trainControl(method="boot",
+                     number=5,
+                     savePrediction=TRUE)
+
+# Sets seed for replication purposes
+set.seed(27)
+fit.lm <- train(strain ~ maxHR + averHR + cal,
+                data = whoop_df_strain_reg,
+                method = "lm",
+                trControl = ctrl)
+
+summary(fit.lm)
+```
+
+
 
 ROOT-MEAN SQUARE ERROR (RMSE)
 --> The RMSE is the square root of the variance of the residuals. It indicates the absolute fit of the model to the data–how close the observed data points are to the model’s predicted values. Whereas R-squared is a relative measure of fit, RMSE is an absolute measure of fit. As the square root of a variance, RMSE can be interpreted as the standard deviation of the unexplained variance, and has the useful property of being in the same units as the response variable. Lower values of RMSE indicate better fit. RMSE is a good measure of how accurately the model predicts the response, and it is the most important criterion for fit if the main purpose of the model is prediction.
