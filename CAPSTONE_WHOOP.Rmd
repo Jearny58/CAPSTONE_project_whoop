@@ -175,17 +175,19 @@ library(ggplot2)
 ggplot(whoop_df_explore, aes(x = maxHR, y = strain)) + 
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title="Scatterplot of Max Heart Rate and Strain Score", x="Max Heart Rate", y = "")
+  labs(title="Scatterplot of Max Heart Rate and Strain Score", x="Max Heart Rate", y = "Strain")
 
 # scatter plot with average heart rate on x-axis and strain on y-axis
 ggplot(whoop_df_explore, aes(x = averHR, y = strain)) +
   geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title="Scatterplot of Average Heart Rate and Strain Score", x="Average Heart Rate", y = "Strain")
 
 # scatter plot with calories on x-axis and strain on y-axis
 ggplot(whoop_df_explore, aes(x = cal, y = strain)) +
   geom_point() + 
-  geom_smooth(method = "lm", se = FALSE)
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title="Scatterplot of Calories and Strain Score", x="Calories", y = "Strain")
 
 # correlation between strain and the three variables
 cor(whoop_df_explore$strain, whoop_df_explore$maxHR)
