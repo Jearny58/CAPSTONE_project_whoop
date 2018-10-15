@@ -305,6 +305,8 @@ cv_strain_error_squared = cv_strain_model_error^2
 ```{r}
 library(caret)
 
+#123
+
 # Creates control file
 ctrl <- trainControl(method="boot",
                      number=5,
