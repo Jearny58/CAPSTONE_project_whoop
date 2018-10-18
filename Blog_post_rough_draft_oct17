@@ -1,0 +1,47 @@
+A slide deck or a blog post which presents your analysis to your clients (e.g. non-technical and business teams) in an easy to understand, but compelling way. As a data scientist in a company, you’ll be frequently called upon to produce these kinds of materials.
+
+It seems like everybody has some sort of wearable on their wrist these days. From the well-known (and super popular) Apple Watch to the “how many steps have I taken today?” Fitbits, smartwatches and fitness trackers are everywhere and they’re here to stay (1).
+This is just the start too. The wearable market is still in its infancy, seeing as the first Fitbit was released around 2009; Samsung released its Galaxy Gear in late 2013; and the Apple Watch wasn’t introduced until 2015 (2).
+Knowing this, there is a lot of potential for what wearables could be in the not-so-far future. There is one in particular though, called WHOOP, that might be ushering in a new era of wearable technology sooner rather than later.
+While WHOOP has flown under the mainstream radar it has nonetheless gained quite the following amongst professional athletes in the NFL, MLB and NBA (including King James himself…). The list doesn’t stop there though; the list of athletes also includes a NASCAR driver, Tour de France cyclist and top CrossFit Games athletes (3).
+Now what makes WHOOP different? Well, the first obvious feature (or lack thereof) is it’s lack of a user interface; there is no screen.
+The only way to access the information is via the mobile or web-based app. Admittedly, this is an adjustment at first; after all how are you going to check your texts?!?
+This device isn’t trying to be a smart watch though; it is completely devoted to health tracking, and nothing else. 
+It is for this reason though that it excels and the data it is able to capture is nothing short of amazing. 
+Now let’s get into the amazing part, which is the wealth of information WHOOP provides to its user. 
+At the surface, it may seem simplistic in its approach; three primary metrics are provided to the user -- Strain, Recovery, and Sleep Performance -- which show, respectively, how strenuous that particular day has been, how well the body has responded and recovered from the previous days stimulus, and how much sleep you got versus how much you needed. 
+How are these scores calculated though?
+Well the strap is collecting data 100x/second, 24/hours a day, 7/days a week on the following biological markers:
+Side note: one of its best features is that the charger is slid over the band, allowing for it to simultaneously continue tracking while also charging the battery. 
+average heart rate
+max heart rate achieved that day
+calories burned
+total time spent in bed and asleep
+total time spent in light, REM, and deep(SWS) stages of sleep
+total sleep cycles
+heart-rate variability (HRV)
+resting heart rate (RHR)
+disturbances during sleep
+sleep latency (i.e. how long it took to fall asleep)
+As you can see there is a lot more than meets the eye.
+Personally, this treasure trove of health-related data has significantly contributed to creating an overall healthier lifestyle. 
+For example, I make a more conscious effort to get to bed early, and ensure I’m getting adequate sleep. 
+Also, I’ve significantly cut back on my drinking (I don’t completely abstain though, I’ll have a brew or glass of wine every now and then). 
+Personal benefits aside though, after starting Springboard’s Introduction to Data Science course, I realized that the skillset offered another potential opportunity for improvement: to test my newfound data science skill set!
+While WHOOP does an amazing job condensing all the information down into three easy to understand metrics, exactly how they’re calculated is somewhat of a mystery. 
+We know they take the variables mentioned above as input (such as average heart-rate, resting heart rate, heart-rate variability, etc.) perform some algorithmic magic and spit out the scores that we see for Strain, Recovery and Sleep performance. 
+Now don’t construe this with simply putting something in and something coming out. WHOOP has done their research; they’ve created algorithms that weight all the inputs and generate a score based on these inputs.
+Yet, since we don’t work for WHOOP, we are not privy to this information.
+However, by analyzing this data we can begin to formulate ideas how they went about creating these algorithms while at the same time seeing if we can take it a step further. 
+My Springboard Mentor Jarus Singh and I started wondering: what if with all this information, we could not only further understand certain trends that contribute to these scores but possibly even find a way to predict Strain, Recovery and Sleep Performance? 
+So without further ado, here’s what we found! 
+To begin, I took the daily observations of each of the variables mentioned above for the past four months. 
+Initial exploratory analysis showed some interesting trends (that we’ll dive further into later). 
+First, let’s take a look at the relationship between Strain and three variables associated with heart rate: max heart rate, average heart rate and calories (burned). 
+INSERT SCATTERPLOTS OF STRAIN VS. MHR, AHR AND CAL
+While not perfect, we can see that there is a pretty strong relationship between the Strain value and max heart rate, average heart rate and calories.
+Intuitively this makes sense; if you physically work harder, it’s going to naturally cause your heart rate to escalate.
+Additionally, because your body is in a more active state it will consume more energy, i.e. calories, to keep up with the physical demands being placed upon it. 
+Next, let’s move onto Sleep Performance. This is one of the key strong points of WHOOP; not only is it able to detect the amount of time you spent in bed and asleep, it can track the time spent in each stage of sleep (light, REM, deep) and the number of sleep cycles as well. 
+
+
