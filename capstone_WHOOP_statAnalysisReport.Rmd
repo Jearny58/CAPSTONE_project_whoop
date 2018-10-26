@@ -47,13 +47,18 @@ So HRV is not only a great tracker for overall fitness, but lifestyle as well. T
 ```{r}
 library(ggplot2)
 summary(whoop_edit4$hrv)
+library(knitr)
 
 fill <- "#4271AE"
 line <- "#1F3552"
 
-ggplot(data = whoop_edit4, aes(x = "", y = hrv)) + 
+hrv_boxplot = ggplot(data = whoop_edit4, aes(x = "", y = hrv)) + 
   geom_boxplot(fill = fill, color = line, alpha = 0.7) +
   scale_y_continuous(name = "HRV", breaks = seq(40, 115, 10), limits = c(40, 115))
+
+hrv_boxplot
+
+knit(hrv_boxplot)
 ```
 
 As I can see from the box plot it looks like my HRV tends to stay somewhere between 60 and approximately 80. What about the distribution of my HRV, are there any insights in terms of the distribution of the values? 
@@ -155,7 +160,7 @@ Looking at Strain in the context of heart rate, there are two variables that we 
 library(ggplot2)
 
 ggplot(whoop_edit4, aes(x = averHR, y = strain)) +
-  geom_point(alpha = 0.5, position = "jitter")
+  geom_point(alpha = 0.5)
 
 ggplot(whoop_edit4, aes(x = maxHR, y = strain)) + 
   geom_point(alpha = 0.5)

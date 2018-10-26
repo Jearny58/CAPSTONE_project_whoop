@@ -280,17 +280,54 @@ library(boot)
 strain_model_formula = as.formula(strain ~ maxHR + averHR + cal)
 strain_model_formula
 
+# formula #2 for strain linear regression model
+strain_model_formula2 = as.formula(strain ~ averHR + cal)
+
+# formula #3 for strain linear regression model
+strain_model_formula3 = as.formula(strain ~ maxHR + cal)
+
+# formula #4 for strain linear regressional model
+strain_model_formula4 = as.formula(strain ~ maxHR + averHR)
+
+
 # K-fold CV
-strain_mse_10foldcv = NULL
+strain_mse_10foldcv1 = NULL
+strain_mse_10foldcv2 = NULL
+strain_mse_10foldcv3 = NULL
+strain_mse_10foldcv4 = NULL
 
 for(i in 1:10) {
   model = glm(strain_model_formula, data = whoop_df_strain_reg)
-  strain_mse_10foldcv[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
+  strain_mse_10foldcv1[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(strain_model_formula2, data = whoop_df_strain_reg)
+  strain_mse_10foldcv2[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(strain_model_formula3, data = whoop_df_strain_reg)
+  strain_mse_10foldcv3[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(strain_model_formula4, data = whoop_df_strain_reg)
+  strain_mse_10foldcv4[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
 }
 
 # mean of RMSE of 10-fold cross-validation
-sqrt(strain_mse_10foldcv)
-mean(sqrt(strain_mse_10foldcv))
+sqrt(strain_mse_10foldcv1)
+mean(sqrt(strain_mse_10foldcv1))
+
+sqrt(strain_mse_10foldcv2)
+mean(sqrt(strain_mse_10foldcv2))
+
+sqrt(strain_mse_10foldcv3)
+mean(sqrt(strain_mse_10foldcv3))
+
+sqrt(strain_mse_10foldcv4)
+mean(sqrt(strain_mse_10foldcv4))
 
 # predict from a full model
 whoop_df_strain_reg$strainPredict.cv = predict(strain_model1, data = whoop_df_strain_reg)
@@ -457,17 +494,50 @@ library(boot)
 sleep_model_formula = as.formula(sleepPerform ~ timeInBed + totalSleep)
 sleep_model_formula
 
+# additional formulas for potential models of sleep performance
+sleep_model_formula2 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles)
+sleep_model_formula3 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep)
+sleep_model_formula4 = as.formula(sleepPerform ~ timeInBed + totalSleep + sleepCycles)
+
+
 # K-fold CV
-sleep_mse_10foldcv = NULL
+sleep_mse_10foldcv1 = NULL
+sleep_mse_10foldcv2 = NULL
+sleep_mse_10foldcv3 = NULL
+sleep_mse_10foldcv4 = NULL
 
 for(i in 1:10) {
   model = glm(sleep_model_formula, data = whoop_df_sleepPerform_reg)
-  sleep_mse_10foldcv[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+  sleep_mse_10foldcv1[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula2, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv2[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula3, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv3[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula4, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv4[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
 }
 
 # mean of RMSE of 10-fold cross-validation
 sqrt(sleep_mse_10foldcv)
 mean(sqrt(sleep_mse_10foldcv))
+
+sqrt(sleep_mse_10foldcv2)
+mean(sqrt(sleep_mse_10foldcv2))
+
+sqrt(sleep_mse_10foldcv3)
+mean(sqrt(sleep_mse_10foldcv3))
+
+sqrt(sleep_mse_10foldcv4)
+mean(sqrt(sleep_mse_10foldcv4))
 
 # predict from a full model
 whoop_df_sleepPerform_reg$sleepPredict.cv = predict(sleepPerform_model4, data = whoop_df_sleepPerform_reg)
@@ -570,17 +640,49 @@ library(boot)
 recovery_model_formula = as.formula(recovery ~ hrv + sleepPerform)
 recovery_model_formula
 
+# additional formulas for potential models of sleep performance
+recovery_model_formula2 = as.formula(recovery ~ hrv + timeInBed + totalSleep)
+recovery_model_formula3 = as.formula(recovery ~ hrv + totalSleep)
+recovery_model_formula4 = as.formula(recovery ~ hrv + restHR + totalSleep)
+
 # K-fold CV
 recovery_mse_10foldcv = NULL
+recovery_mse_10foldcv2 = NULL
+recovery_mse_10foldcv3 = NULL
+recovery_mse_10foldcv4 = NULL
 
 for(i in 1:10) {
   model = glm(recovery_model_formula, data = whoop_df_recovery_reg)
   recovery_mse_10foldcv[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
 }
 
+for(i in 1:10) {
+  model = glm(recovery_model_formula2, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv2[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula3, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv3[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula4, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv4[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
 # mean of RMSE of 10-fold cross-validation
 sqrt(recovery_mse_10foldcv)
 mean(sqrt(recovery_mse_10foldcv))
+
+sqrt(recovery_mse_10foldcv2)
+mean(sqrt(recovery_mse_10foldcv2))
+
+sqrt(recovery_mse_10foldcv3)
+mean(sqrt(recovery_mse_10foldcv3))
+
+sqrt(recovery_mse_10foldcv4)
+mean(sqrt(recovery_mse_10foldcv4))
 
 # predict from a full model
 whoop_df_recovery_reg$recoveryPredict.cv = predict(recovery_model1, data = whoop_df_recovery_reg)

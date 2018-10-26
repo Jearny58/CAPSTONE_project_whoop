@@ -83,7 +83,7 @@ whoop_df_explore = whoop_edit4
 ggplot(whoop_df_explore, aes(x = "", y = strain)) + 
   geom_boxplot()
 ggplot(whoop_df_explore, aes(x = strain)) + 
-  geom_histogram(aes(y = ..density..), binwidth = 1, color="black", fill="white") + 
+  geom_histogram(aes(y = ..density..), binwidth = 1, color="black", fill="grey") + 
   geom_density(aes(x = strain), alpha=.2, fill="#FF6666") +
   labs(title="Strain Histogram", x="Strain Score")
 
