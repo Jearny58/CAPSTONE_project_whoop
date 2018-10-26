@@ -491,13 +491,13 @@ K-FOLD CROSS VALIDATION FOR SLEEP PERFORMANCE MODEL
 library(boot)
 
 # formula for sleep performance linear regression model
-sleep_model_formula = as.formula(sleepPerform ~ timeInBed + totalSleep)
+sleep_model_formula4 = as.formula(sleepPerform ~ timeInBed + totalSleep)
 sleep_model_formula
 
 # additional formulas for potential models of sleep performance
-sleep_model_formula2 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles)
-sleep_model_formula3 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep)
-sleep_model_formula4 = as.formula(sleepPerform ~ timeInBed + totalSleep + sleepCycles)
+sleep_model_formula1 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles)
+sleep_model_formula2 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep)
+sleep_model_formula3 = as.formula(sleepPerform ~ timeInBed + totalSleep + sleepCycles)
 
 
 # K-fold CV
