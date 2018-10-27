@@ -492,7 +492,6 @@ library(boot)
 
 # formula for sleep performance linear regression model
 sleep_model_formula4 = as.formula(sleepPerform ~ timeInBed + totalSleep)
-sleep_model_formula
 
 # additional formulas for potential models of sleep performance
 sleep_model_formula1 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles)
@@ -527,8 +526,8 @@ for(i in 1:10) {
 }
 
 # mean of RMSE of 10-fold cross-validation
-sqrt(sleep_mse_10foldcv)
-mean(sqrt(sleep_mse_10foldcv))
+sqrt(sleep_mse_10foldcv1)
+mean(sqrt(sleep_mse_10foldcv1))
 
 sqrt(sleep_mse_10foldcv2)
 mean(sqrt(sleep_mse_10foldcv2))
@@ -586,14 +585,23 @@ library(ggplot2)
 (whoop_df_recovery_reg = whoop_df_explore)
 
 # linear regression to predict recovery w/ hrv and sleepPerform as independent variable
-recovery_model1 = glm(recovery ~ hrv + sleepPerform, data = whoop_df_explore)
+recovery_model3 = lm(recovery ~ hrv + sleepPerform, data = whoop_df_explore)
 summary(recovery_model1)
 
-recovery_model2 = glm(recovery ~ hrv + timeInBed + totalSleep, data = whoop_df_explore)
+recovery_model2 = lm(recovery ~ hrv + totalSleep, data = whoop_df_explore)
 summary(recovery_model2)
 
+recovery_model1 = lm(recovery ~ hrv + restHR + totalSleep, data = whoop_df_explore)
+summary(recovery_model3)
+
+recovery_model4 = lm(recovery ~ hrv + sleepPerform + cal, data = whoop_df_explore)
+summary(recovery_model4)
+
+recovery_model5 = lm(recovery ~ hrv + totalSleep + cal, data = whoop_df_explore)
+summary(recovery_model5)
+
 # create new column, recoveryPredict, that shows what the model would predict the recovery score would be based off of hrv and sleep performance
-whoop_df_recovery_reg$recoveryPredict = predict(recovery_model1, whoop_df_recovery_reg)
+whoop_df_recovery_reg$recoveryPredict = predict(recovery_model3, whoop_df_recovery_reg)
 head(whoop_df_recovery_reg, n = 6)
 
 # scatter plot to show linear regression line (i.e. predicted recovery score) against the actual recovery scores
@@ -604,7 +612,7 @@ ggplot(whoop_df_recovery_reg, aes(x = recoveryPredict, y = recovery)) +
 
 # create new data frame with single observation of hrv and sleepPerform to test recovery model 
 new_recovery = data.frame(hrv = 71, sleepPerform = 0.63) # scores are from 8-14-2018 observation, w/ a recovery score of 0.58
-new_recovery$prediction = predict(recovery_model1, newdata = new_recovery)
+new_recovery$prediction = predict(recovery_model3, newdata = new_recovery)
 new_recovery
 
 ```
@@ -637,19 +645,18 @@ K-FOLD CROSS VALIDATION FOR RECOVERY MODEL
 library(boot)
 
 # formula for recovery linear regression model
-recovery_model_formula = as.formula(recovery ~ hrv + sleepPerform)
-recovery_model_formula
-
-# additional formulas for potential models of sleep performance
-recovery_model_formula2 = as.formula(recovery ~ hrv + timeInBed + totalSleep)
-recovery_model_formula3 = as.formula(recovery ~ hrv + totalSleep)
-recovery_model_formula4 = as.formula(recovery ~ hrv + restHR + totalSleep)
+recovery_model_formula1 = as.formula(recovery ~ hrv + restHR + totalSleep)
+recovery_model_formula2 = as.formula(recovery ~ hrv + totalSleep)
+recovery_model_formula3 = as.formula(recovery ~ hrv + sleepPerform)
+recovery_model_formula4 = as.formula(recovery ~ hrv + sleepPerform + cal)
+recovery_model_formula5 = as.formula(recovery ~ hrv + totalSleep + cal)
 
 # K-fold CV
-recovery_mse_10foldcv = NULL
+recovery_mse_10foldcv1 = NULL
 recovery_mse_10foldcv2 = NULL
 recovery_mse_10foldcv3 = NULL
 recovery_mse_10foldcv4 = NULL
+recovery_mse_10foldcv5 = NULL
 
 for(i in 1:10) {
   model = glm(recovery_model_formula, data = whoop_df_recovery_reg)
@@ -671,6 +678,11 @@ for(i in 1:10) {
   recovery_mse_10foldcv4[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
 }
 
+for(i in 1:10) {
+  model = glm(recovery_model_formula5, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv5[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
 # mean of RMSE of 10-fold cross-validation
 sqrt(recovery_mse_10foldcv)
 mean(sqrt(recovery_mse_10foldcv))
@@ -684,8 +696,11 @@ mean(sqrt(recovery_mse_10foldcv3))
 sqrt(recovery_mse_10foldcv4)
 mean(sqrt(recovery_mse_10foldcv4))
 
+sqrt(recovery_mse_10foldcv5)
+mean(sqrt(recovery_mse_10foldcv5))
+
 # predict from a full model
-whoop_df_recovery_reg$recoveryPredict.cv = predict(recovery_model1, data = whoop_df_recovery_reg)
+whoop_df_recovery_reg$recoveryPredict.cv = predict(recovery_model3, data = whoop_df_recovery_reg)
 
 # RMSE for full model's predictions
 cv_recovery_model_error = whoop_df_recovery_reg$recoveryPredict.cv - whoop_df_recovery_reg$recovery
