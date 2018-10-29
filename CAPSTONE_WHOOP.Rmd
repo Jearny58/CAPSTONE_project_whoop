@@ -203,12 +203,20 @@ From these scatter plots, we can see that all three variables (max heart rate, a
 What these high correlation values tell me is that there is an obvious connection between strain and max heart rate, average heart rate and calories. From here, we can start to dive into linear regression to see if we can create a model that can accurately predict the daily strain score.
 
 ```{r}
-# using glm function to create first model
-strain_model1 = glm(strain ~ maxHR + averHR + cal, data = whoop_df_explore)
+# using lm function to create models
+strain_model1 = lm(strain ~ maxHR + averHR + cal, data = whoop_df_explore)
 summary(strain_model1)
 
-strain_model2 = glm(strain ~ maxHR + cal, data = whoop_df_explore)
+strain_model2 = lm(strain ~ averHR + cal, data = whoop_df_explore)
 summary(strain_model2)
+
+strain_model3 = lm(strain ~ maxHR + cal, data = whoop_df_explore)
+summary(strain_model3)
+
+strain_model4 = lm(strain ~ maxHR + averHR, data = whoop_df_explore)
+summary(strain_model4)
+
+
 ```
 I created two models, strain_model1 and strain_model2, that looks to predict the strain using 3 predictor variables (maxHR, averHR, cal) for the first model and 2 predictor variables (maxHR, cal) for the second model. The reasoning for the second model was to see what the affect on NOT including averHR would do to the model (since averHR's p-value was 0.0452, barely under the 0.05 threshold, and the fact that maxHR and cal showed an overwhelingly significant relationship). The second model proved to be almost as good as the first one, with it's R-squared being only 0.0031 below that of strain_model1. Despite this however, I have decided to go with strain_model1 for further analysis. 
 
@@ -280,8 +288,8 @@ CROSS VALIDATION OF STRAIN MODEL
 library(boot)
 
 # formula for strain linear regression model
-strain_model_formula = as.formula(strain ~ maxHR + averHR + cal)
-strain_model_formula
+strain_model_formula1 = as.formula(strain ~ maxHR + averHR + cal)
+strain_model_formula1
 
 # formula #2 for strain linear regression model
 strain_model_formula2 = as.formula(strain ~ averHR + cal)
@@ -300,7 +308,7 @@ strain_mse_10foldcv3 = NULL
 strain_mse_10foldcv4 = NULL
 
 for(i in 1:10) {
-  model = glm(strain_model_formula, data = whoop_df_strain_reg)
+  model = glm(strain_model_formula1, data = whoop_df_strain_reg)
   strain_mse_10foldcv1[i] = cv.glm(whoop_df_strain_reg, model, K = 10)$delta[1]
 }
 
@@ -417,17 +425,17 @@ ggplot(whoop_df_explore, aes(x = sleepCycles, y = sleepPerform)) +
 MODEL FOR SLEEP PERFORMANCE
 ```{r}
 # linear regression to predict sleepPerform using stages of sleep (primarily)
-sleepPerform_model1 = glm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_df_explore)
+sleepPerform_model1 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_df_explore)
 summary(sleepPerform_model1)
 
-sleepPerform_model2 = glm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep, data = whoop_df_explore)
+sleepPerform_model2 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep, data = whoop_df_explore)
 summary(sleepPerform_model2)
 
 # linear regress to predict sleepPerform using total time spent in bed and sleeping
-sleepPerform_model3 = glm(sleepPerform ~ timeInBed + totalSleep + sleepCycles, data = whoop_df_explore)
+sleepPerform_model3 = lm(sleepPerform ~ timeInBed + totalSleep + sleepCycles, data = whoop_df_explore)
 summary(sleepPerform_model3)
 
-sleepPerform_model4 = glm(sleepPerform ~ timeInBed + totalSleep, data = whoop_df_explore)
+sleepPerform_model4 = lm(sleepPerform ~ timeInBed + totalSleep, data = whoop_df_explore)
 summary(sleepPerform_model4)
 
 ```
