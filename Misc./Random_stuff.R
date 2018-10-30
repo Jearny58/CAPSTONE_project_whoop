@@ -71,4 +71,15 @@ ggplot(whoop_edit4, aes(x = totalSleep)) +
   geom_histogram(binwidth = 0.5, aes(y = ..density..), color = "black", fill = "grey") + 
   geom_density(aes(x = strain), alpha=.2, fill="#FF6666") +
   labs(title="Total Sleep Histogram", x="Total Sleep")
-  
+
+# scatter plot to show linear regression line (i.e. predicted strain score) against the actual strain scores
+ggplot(whoop_df_strain_reg, aes(x = strainPredict, y = strain)) +
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_abline(color = "red") + 
+  labs(title="Model #1: Predicted Strain vs. Actual Strain", x="Predicted Strain (based off model)", y = "Actual Strain Score")
+
+# scatter plot to show linear regression line (i.e. predicted recovery score) against the actual recovery scores
+ggplot(whoop_df_recovery_reg, aes(x = recoveryPredict, y = recovery)) +
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_abline(color = "red") + 
+  labs(title="Model #4: Predicted Recovery vs. Actual Recovery", x="Predicted Recovery (based off model)", y = "Actual Recovery Score")  

@@ -455,7 +455,7 @@ library(sigr)
 (whoop_df_sleepPerform_reg = whoop_df_explore)
 
 # create new column, sleepPredict, that shows what the model would predict the sleep performance score would be based off of time in bed and total sleep
-whoop_df_sleepPerform_reg$sleepPredict = predict(sleepPerform_model4, whoop_df_sleepPerform_reg)
+whoop_df_sleepPerform_reg$sleepPredict = predict(sleepPerform_model3, whoop_df_sleepPerform_reg)
 head(whoop_df_sleepPerform_reg, n = 6)
 
 library(ggplot2)
@@ -612,14 +612,14 @@ recovery_model5 = lm(recovery ~ hrv + totalSleep + cal, data = whoop_df_explore)
 summary(recovery_model5)
 
 # create new column, recoveryPredict, that shows what the model would predict the recovery score would be based off of hrv and sleep performance
-whoop_df_recovery_reg$recoveryPredict = predict(recovery_model3, whoop_df_recovery_reg)
+whoop_df_recovery_reg$recoveryPredict = predict(recovery_model4, whoop_df_recovery_reg)
 head(whoop_df_recovery_reg, n = 6)
 
 # scatter plot to show linear regression line (i.e. predicted recovery score) against the actual recovery scores
 ggplot(whoop_df_recovery_reg, aes(x = recoveryPredict, y = recovery)) +
   geom_point(alpha = 0.9, shape = 5) +
   geom_abline(color = "red") + 
-  labs(title="Scatterplot of Predicted Recovery Score vs. Actual Recovery Score", x="Predicted Recovery (based off model)", y = "Actual Recovery Score")
+  labs(title="Model #4: Predicted Recovery vs. Actual Recovery", x="Predicted Recovery (based off model)", y = "Actual Recovery Score")
 
 # create new data frame with single observation of hrv and sleepPerform to test recovery model 
 new_recovery = data.frame(hrv = 71, sleepPerform = 0.63) # scores are from 8-14-2018 observation, w/ a recovery score of 0.58
