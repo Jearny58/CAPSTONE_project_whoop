@@ -21,6 +21,7 @@ summary(whoop_df_original) # summary statistics for whoop_df_original
 
 STEP 1: CLEANING THE DATA
 As we can see from above, there are 61 NA's in most columns, but only 60 NA's in Date and Strain. Let's dive a little deeper into why this is. 
+
 ```{r}
 whoop_edit <- whoop_df_original
 
