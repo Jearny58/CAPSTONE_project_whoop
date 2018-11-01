@@ -250,3 +250,301 @@ whoop_df_strain_reg$strainPredict.cv = predict(strain_model1, data = whoop_df_st
 cv_strain_model_error = whoop_df_strain_reg$strainPredict.cv - whoop_df_strain_reg$strain
 cv_strain_error_squared = cv_strain_model_error^2
 (cv_strain_model_rmse = sqrt(mean(cv_strain_error_squared)))
+
+# EXPLORATORY ANALYSIS FOR SLEEP PERFORMANCE
+
+# returns sleepPerform column
+sleep_y = whoop_df_explore[4]
+
+# returns columns 8 through 15
+sleep_x = whoop_df_explore[8:15]
+
+# cor() function to see any interesting variables to check out visually with regards to sleep performance
+cor(sleep_x, sleep_y)
+
+# scatter plot with timeInBed as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeInBed, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with timeLightSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeLightSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with timeREMSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeREMSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+#scatter plot with timeDeepSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = timeDeepSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+#scatter plot with totalSleep as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = totalSleep, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with sleepCycles as x and sleepPerform as y
+ggplot(whoop_df_explore, aes(x = sleepCycles, y = sleepPerform)) + 
+  geom_point(alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# MODEL FOR SLEEP PERFORMANCE
+
+# linear regression to predict sleepPerform using stages of sleep (primarily)
+sleepPerform_model1 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles, data = whoop_df_explore)
+summary(sleepPerform_model1)
+
+sleepPerform_model2 = lm(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep, data = whoop_df_explore)
+summary(sleepPerform_model2)
+
+# linear regress to predict sleepPerform using total time spent in bed and sleeping
+sleepPerform_model3 = lm(sleepPerform ~ timeInBed + totalSleep + sleepCycles, data = whoop_df_explore)
+summary(sleepPerform_model3)
+
+sleepPerform_model4 = lm(sleepPerform ~ timeInBed + totalSleep, data = whoop_df_explore)
+summary(sleepPerform_model4)
+
+# load sigr library so we can see statistical summaries more easily
+library(sigr)
+
+# create data set specifically for sleep performance regression model
+(whoop_df_sleepPerform_reg = whoop_df_explore)
+
+# create new column, sleepPredict, that shows what the model would predict the sleep performance score would be based off of time in bed and total sleep
+whoop_df_sleepPerform_reg$sleepPredict = predict(sleepPerform_model3, whoop_df_sleepPerform_reg)
+head(whoop_df_sleepPerform_reg, n = 6)
+
+# scatter plot to show linear regression line (i.e. predicted sleep performance score) against the actual sleep performance scores
+ggplot(whoop_df_sleepPerform_reg, aes(x = sleepPredict, y = sleepPerform)) +
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_abline(color = "red") + 
+  labs(title="Scatterplot of Predicted Sleep Perf. Score vs. Actual Sleep Perf. Score", x="Predicted Sleep Perf. (based off model)", y = "Actual Sleep Perf. Score")
+
+# create new data frame with single observation of timeInBed and totalSleep to test sleep model 
+new_sleep = data.frame(timeInBed = 6.28, totalSleep = 5.78)
+new_sleep$prediction = predict(sleepPerform_model4, newdata = new_sleep)
+new_sleep
+
+# create new column, sleepResiduals, with the residuals b/w predicted sleep score and actual sleep value
+whoop_df_sleepPerform_reg$sleepResiduals = whoop_df_sleepPerform_reg$sleepPerform - whoop_df_sleepPerform_reg$sleepPredict
+
+# plot showcasing residuals of model vs. actual sleep value
+ggplot(whoop_df_sleepPerform_reg, aes(x = sleepPredict, y = sleepResiduals)) +
+  geom_pointrange(aes(ymin = 0, ymax = sleepResiduals), alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  labs(title="Plot of Residuals between Predicted Sleep Score & Actual Sleep Score", x="Sleep", y = "Residuals")
+
+# RMSE 
+sleep_model_error = whoop_df_sleepPerform_reg$sleepPredict - whoop_df_strain_reg$sleepPerform
+sleep_error_squared = sleep_model_error^2
+(sleep_model_rmse = sqrt(mean(sleep_error_squared)))
+sd(whoop_df_sleepPerform_reg$sleepPerform)
+
+## Proportion of values contained between 2 RMSEs
+mean(abs(sleep_model_error) < 2 * sleep_model_rmse)
+
+
+# CROSS VALIDATION FOR SLEEP PERFORMANCE
+
+library(boot)
+
+# formula for sleep performance linear regression model
+sleep_model_formula4 = as.formula(sleepPerform ~ timeInBed + totalSleep)
+
+# additional formulas for potential models of sleep performance
+sleep_model_formula1 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep + sleepCycles)
+sleep_model_formula2 = as.formula(sleepPerform ~ timeLightSleep + timeREMSleep + timeDeepSleep)
+sleep_model_formula3 = as.formula(sleepPerform ~ timeInBed + totalSleep + sleepCycles)
+
+# K-fold CV
+sleep_mse_10foldcv1 = NULL
+sleep_mse_10foldcv2 = NULL
+sleep_mse_10foldcv3 = NULL
+sleep_mse_10foldcv4 = NULL
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv1[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula2, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv2[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula3, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv3[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(sleep_model_formula4, data = whoop_df_sleepPerform_reg)
+  sleep_mse_10foldcv4[i] = cv.glm(whoop_df_sleepPerform_reg, model, K = 10)$delta[1]
+}
+
+# mean of RMSE of 10-fold cross-validation
+sqrt(sleep_mse_10foldcv1)
+mean(sqrt(sleep_mse_10foldcv1))
+
+sqrt(sleep_mse_10foldcv2)
+mean(sqrt(sleep_mse_10foldcv2))
+
+sqrt(sleep_mse_10foldcv3)
+mean(sqrt(sleep_mse_10foldcv3))
+
+sqrt(sleep_mse_10foldcv4)
+mean(sqrt(sleep_mse_10foldcv4))
+
+# predict from a full model
+whoop_df_sleepPerform_reg$sleepPredict.cv = predict(sleepPerform_model4, data = whoop_df_sleepPerform_reg)
+
+# RMSE for full model's predictions
+cv_sleep_model_error = whoop_df_sleepPerform_reg$sleepPredict.cv - whoop_df_sleepPerform_reg$sleepPerform
+cv_sleep_error_squared = cv_sleep_model_error^2
+(cv_sleep_model_rmse = sqrt(mean(cv_sleep_error_squared)))
+
+# EXPLORATORY ANALYSIS FOR RECOVERY
+
+# use whoop_df_explore for exploratory analysis of sleep performance
+library(dplyr)
+
+# create data frames to test correlation between recovery score and other variables
+(recovery_x = whoop_df_explore[3])
+(recovery_y = whoop_df_explore[4:15])
+
+# shows correlations between recovery and other variables
+cor(recovery_y, recovery_x)
+
+# scatter plot with hrv as x and recovery as y
+ggplot(whoop_df_explore, aes(x = hrv, y = recovery)) + 
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# scatter plot with sleepPerform as x and recovery as y
+ggplot(whoop_df_explore, aes(x = sleepPerform, y = recovery)) + 
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_smooth(method = "lm", se = FALSE)
+
+# load sigr library so we can see statistical summaries more easily
+library(sigr)
+
+# create data set specifically for recovery regression model
+(whoop_df_recovery_reg = whoop_df_explore)
+
+# linear regression to predict recovery w/ hrv and sleepPerform as independent variable
+recovery_model3 = lm(recovery ~ hrv + sleepPerform, data = whoop_df_explore)
+summary(recovery_model1)
+
+recovery_model2 = lm(recovery ~ hrv + totalSleep, data = whoop_df_explore)
+summary(recovery_model2)
+
+recovery_model1 = lm(recovery ~ hrv + restHR + totalSleep, data = whoop_df_explore)
+summary(recovery_model3)
+
+recovery_model4 = lm(recovery ~ hrv + sleepPerform + cal, data = whoop_df_explore)
+summary(recovery_model4)
+
+recovery_model5 = lm(recovery ~ hrv + totalSleep + cal, data = whoop_df_explore)
+summary(recovery_model5)
+
+# create new column, recoveryPredict, that shows what the model would predict the recovery score would be based off of hrv and sleep performance
+whoop_df_recovery_reg$recoveryPredict = predict(recovery_model4, whoop_df_recovery_reg)
+head(whoop_df_recovery_reg, n = 6)
+
+# scatter plot to show linear regression line (i.e. predicted recovery score) against the actual recovery scores
+ggplot(whoop_df_recovery_reg, aes(x = recoveryPredict, y = recovery)) +
+  geom_point(alpha = 0.9, shape = 5) +
+  geom_abline(color = "red") + 
+  labs(title="Model #4: Predicted Recovery vs. Actual Recovery", x="Predicted Recovery (based off model)", y = "Actual Recovery Score")
+
+# create new data frame with single observation of hrv and sleepPerform to test recovery model 
+new_recovery = data.frame(hrv = 71, sleepPerform = 0.63) # scores are from 8-14-2018 observation, w/ a recovery score of 0.58
+new_recovery$prediction = predict(recovery_model3, newdata = new_recovery)
+new_recovery
+
+# create new column, recoveryResiduals, with the residuals b/w predicted recovery score and actual recovery value
+whoop_df_recovery_reg$recoveryResiduals = whoop_df_recovery_reg$recovery - whoop_df_recovery_reg$recoveryPredict
+
+# plot showcasing residuals of model vs. actual recovery value
+ggplot(whoop_df_recovery_reg, aes(x = recoveryPredict, y = recoveryResiduals)) +
+  geom_pointrange(aes(ymin = 0, ymax = recoveryResiduals), alpha = 0.5) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  labs(title="Plot of Residuals between Predicted Recovery Score & Actual Recovery Score", x="Recovery", y = "Residuals")
+
+# RMSE 
+recovery_model_error = whoop_df_recovery_reg$recoveryPredict - whoop_df_recovery_reg$recovery
+recovery_error_squared = recovery_model_error^2
+(recovery_model_rmse = sqrt(mean(recovery_error_squared)))
+sd(whoop_df_strain_reg$strain)
+
+## Proportion of values contained between 2 RMSEs
+mean(abs(recovery_model_error) < 2 * recovery_model_rmse)
+
+# K-FOLD CROSS VALIDATION FOR RECOVERY MODEL
+
+# formula for recovery linear regression model
+recovery_model_formula1 = as.formula(recovery ~ hrv + restHR + totalSleep)
+recovery_model_formula2 = as.formula(recovery ~ hrv + totalSleep)
+recovery_model_formula3 = as.formula(recovery ~ hrv + sleepPerform)
+recovery_model_formula4 = as.formula(recovery ~ hrv + sleepPerform + cal)
+recovery_model_formula5 = as.formula(recovery ~ hrv + totalSleep + cal)
+
+# K-fold CV
+recovery_mse_10foldcv1 = NULL
+recovery_mse_10foldcv2 = NULL
+recovery_mse_10foldcv3 = NULL
+recovery_mse_10foldcv4 = NULL
+recovery_mse_10foldcv5 = NULL
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula2, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv2[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula3, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv3[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula4, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv4[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+for(i in 1:10) {
+  model = glm(recovery_model_formula5, data = whoop_df_recovery_reg)
+  recovery_mse_10foldcv5[i] = cv.glm(whoop_df_recovery_reg, model, K = 10)$delta[1]
+}
+
+# mean of RMSE of 10-fold cross-validation
+sqrt(recovery_mse_10foldcv)
+mean(sqrt(recovery_mse_10foldcv))
+
+sqrt(recovery_mse_10foldcv2)
+mean(sqrt(recovery_mse_10foldcv2))
+
+sqrt(recovery_mse_10foldcv3)
+mean(sqrt(recovery_mse_10foldcv3))
+
+sqrt(recovery_mse_10foldcv4)
+mean(sqrt(recovery_mse_10foldcv4))
+
+sqrt(recovery_mse_10foldcv5)
+mean(sqrt(recovery_mse_10foldcv5))
+
+# predict from a full model
+whoop_df_recovery_reg$recoveryPredict.cv = predict(recovery_model3, data = whoop_df_recovery_reg)
+
+# RMSE for full model's predictions
+cv_recovery_model_error = whoop_df_recovery_reg$recoveryPredict.cv - whoop_df_recovery_reg$recovery
+cv_recovery_error_squared = cv_recovery_model_error^2
+(cv_recovery_model_rmse = sqrt(mean(cv_recovery_error_squared)))
